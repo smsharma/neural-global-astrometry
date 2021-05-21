@@ -14,7 +14,7 @@ class SphericalGraphCNN(nn.Module):
     """Spherical GCNN Autoencoder.
     """
 
-    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 2048], [2048, 512], [512, 32]], n_aux=0, n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1):
+    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 2048], [2048, 512], [512, 32]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1):
         """Initialization.
 
         Args:
@@ -24,7 +24,6 @@ class SphericalGraphCNN(nn.Module):
         self.kernel_size = kernel_size
         self.pooling_class = Healpix(mode="max")
 
-        self.n_aux = n_aux
         self.n_params = n_params
 
         self.in_ch = in_ch
@@ -64,7 +63,7 @@ class SphericalGraphCNN(nn.Module):
 
         if fc_dims is not None:
             # Set shape of first input of FC layers to correspond to output of conv layers + aux variables
-            fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_aux + self.n_params) * self.in_ch
+            fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_params) * self.in_ch
         
             for i, (in_ch, out_ch) in enumerate(fc_dims):
                 if i == len(fc_dims) - 1:  # No activation in final FC layer
@@ -74,7 +73,7 @@ class SphericalGraphCNN(nn.Module):
                 setattr(self, "layer_fc_{}".format(i), layer)
                 self.fc_layers.append(layer)
 
-    def forward(self, x):
+    def forward(self, x, theta):
         """Forward Pass.
 
         Args:
@@ -85,7 +84,7 @@ class SphericalGraphCNN(nn.Module):
         """
 
         # Initialize tensor
-        x = x.view(-1, self.npix_init + self.n_aux + self.n_params, self.in_ch)
+        x = x.view(-1, self.npix_init, self.in_ch)
         x_map = x[:, :self.npix_init, :]
 
         # Convolutional layers
@@ -96,10 +95,8 @@ class SphericalGraphCNN(nn.Module):
         x_map = x_map.reshape(x_map.size(0), -1)
 
         # Concatenate auxiliary variable along last dimension
-        if (self.n_aux != 0) or (self.n_params != 0):
-            x_aux = x[:, self.npix_init:self.npix_init + self.n_aux + self.n_params, :]
-            x_aux = x_aux.view(-1, (self.n_aux + self.n_params) * self.in_ch)
-            x_map = torch.cat([x_map, x_aux], -1)
+        if (self.n_params != 0):
+            x_map = torch.cat([x_map, theta], -1)
 
         x_map = x_map.unsqueeze(1)
 
