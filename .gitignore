@@ -1,11 +1,30 @@
-# Data and temporary notebooks
+# Dadocs documentation
+/site
+
+# mypy
+.mypy_cache/
+*.xdv
+*.zip
+
+*.pt
+*.ckpt*
+mlruns
+.mlruns
+
+sbi-logs
+psf_dir
+
+*.tfevents*
+ta and temporary notebooks
 # *.npy
 # *.npz
-.ipynb_checkpoints
+*.ipynb_checkpoints
 .coverage
-batch
-*.batch
-.idea
+*.idea
+.vscode
+samples/
+data/samples/*
+data/models/*
 
 # Tex
 *.aux
@@ -24,7 +43,8 @@ batch
 *.DS_Store
 .DS_Store
 auto
-lenspower.pdf
+
+# Large files
 
 # Cython output
 *.pyc
@@ -41,8 +61,6 @@ lenspower.pdf
 *.core
 *.swo
 
-# Large files
-quasars_phot.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -143,11 +161,4 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-
-*.zip
-*.tar.gz
+# mk

@@ -12,4 +12,4 @@ source ~/.bashrc
 conda activate sbi-fermi
 cd /scratch/sm8383/sbi-astrometry/
 
-python -u simulate.py -n 1000 --name train_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/
+python -u simulate.py -n 100 --name train_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/
