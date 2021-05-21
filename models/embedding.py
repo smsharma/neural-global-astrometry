@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+import healpy as hp
 
 from models.healpix_pool_unpool import Healpix
 from models.laplacians import get_healpix_laplacians
@@ -13,7 +14,7 @@ class SphericalGraphCNN(nn.Module):
     """Spherical GCNN Autoencoder.
     """
 
-    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 2048], [2048, 512], [512, 96]], n_aux=0, n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", conv_channel_config="standard", in_ch=1):
+    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 2048], [2048, 512], [512, 32]], n_aux=0, n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1):
         """Initialization.
 
         Args:
@@ -41,14 +42,10 @@ class SphericalGraphCNN(nn.Module):
         else:
             raise NotImplementedError
         
-        if conv_channel_config == "standard":
-            conv_config = [(self.in_ch, 32), (32, 64), (64, 128), (128, 256), (256, 256), (256, 256), (256, 256)]
-        elif conv_channel_config == "more_channels":
-            conv_config = [(self.in_ch, 32), (32, 64), (64, 128), (128, 256), (256, 512), (512, 512), (512, 512)]
-        else:
-            raise NotImplementedError
+        conv_config = [(self.in_ch, 32), (32, 64), (64, 128), (128, 256)] + [(256, 256)] * (len(nside_list) - 4)
 
-        npix_final = int(len(indexes_list[len(conv_config) - 1]) / 4)  # Number of pixels in final layers
+        self.npix_init = hp.nside2npix(nside_list[0])
+        self.npix_final = int(hp.nside2npix(nside_list[-1]) / 4)  # Number of pixels in final layers
 
         for i, (in_ch, out_ch) in enumerate(conv_config):
 
@@ -67,7 +64,7 @@ class SphericalGraphCNN(nn.Module):
 
         if fc_dims is not None:
             # Set shape of first input of FC layers to correspond to output of conv layers + aux variables
-            fc_dims[0][0] = conv_config[-1][-1] * npix_final + (self.n_aux + self.n_params) * self.in_ch
+            fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_aux + self.n_params) * self.in_ch
         
             for i, (in_ch, out_ch) in enumerate(fc_dims):
                 if i == len(fc_dims) - 1:  # No activation in final FC layer
@@ -88,8 +85,8 @@ class SphericalGraphCNN(nn.Module):
         """
 
         # Initialize tensor
-        x = x.view(-1, 49152 + self.n_aux + self.n_params, self.in_ch)
-        x_map = x[:, :49152, :]
+        x = x.view(-1, self.npix_init + self.n_aux + self.n_params, self.in_ch)
+        x_map = x[:, :self.npix_init, :]
 
         # Convolutional layers
         for layer in self.cnn_layers:
@@ -100,7 +97,7 @@ class SphericalGraphCNN(nn.Module):
 
         # Concatenate auxiliary variable along last dimension
         if (self.n_aux != 0) or (self.n_params != 0):
-            x_aux = x[:, 49152:49152 + self.n_aux + self.n_params, :]
+            x_aux = x[:, self.npix_init:self.npix_init + self.n_aux + self.n_params, :]
             x_aux = x_aux.view(-1, (self.n_aux + self.n_params) * self.in_ch)
             x_map = torch.cat([x_map, x_aux], -1)
 
