@@ -36,10 +36,8 @@ class StandardizeInputs(nn.Module):
 
         if len(theta.shape) != len(x.shape):
             theta = theta.unsqueeze(1)
-
-        x_and_theta = torch.cat([x, theta], -1)
         
-        x = self.embedding_net_y(x_and_theta)
+        x = self.embedding_net_y(x, theta)
         
         return x
 
@@ -72,7 +70,7 @@ def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z
     """
     
     # Infer the output dimensionalities of the embedding_net by making a forward pass.
-    x_numel = embedding_net_y(batch_x, batch_y).numel()
+    x_numel = embedding_net_y(batch_y, batch_x).numel()
 
     if additional_layers:
         neural_net = nn.Sequential(nn.Linear(x_numel, hidden_features), nn.BatchNorm1d(hidden_features), nn.ReLU(), nn.Linear(hidden_features, hidden_features), nn.BatchNorm1d(hidden_features), nn.ReLU(), nn.Linear(hidden_features, 1),)

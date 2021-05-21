@@ -63,6 +63,7 @@ class EstimatorNet(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         theta, x = batch
+        print("1", theta.shape, x.shape)
         loss = torch.mean(self.loss(theta, x, self.proposal))
         self.log('val_loss', loss, on_epoch=True)
 

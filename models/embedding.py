@@ -63,7 +63,7 @@ class SphericalGraphCNN(nn.Module):
 
         if fc_dims is not None:
             # Set shape of first input of FC layers to correspond to output of conv layers + aux variables
-            fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_params) * self.in_ch
+            fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_params)
         
             for i, (in_ch, out_ch) in enumerate(fc_dims):
                 if i == len(fc_dims) - 1:  # No activation in final FC layer
@@ -93,6 +93,8 @@ class SphericalGraphCNN(nn.Module):
 
         # Flatten before putting through convolutional layers
         x_map = x_map.reshape(x_map.size(0), -1)
+
+        print("1", theta.shape, x_map.shape)
 
         # Concatenate auxiliary variable along last dimension
         if (self.n_params != 0):

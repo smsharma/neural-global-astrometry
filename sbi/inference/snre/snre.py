@@ -122,7 +122,7 @@ class RatioEstimator(NeuralInference, ABC):
 
         train_loader, val_loader = self.make_dataloaders(dataset, validation_fraction, training_batch_size)
 
-        num_z_score = 5000  # Z-score using a limited random sample for memory reasons
+        num_z_score = 50  # Z-score using a limited random sample for memory reasons
         theta_z_score, x_z_score = train_loader.dataset[:num_z_score]
 
         logging.info("Z-scoring using {} random training samples for x".format(num_z_score))
@@ -134,6 +134,8 @@ class RatioEstimator(NeuralInference, ABC):
         self.x_shape = x_shape_from_simulation(x_z_score)
 
         max_num_epochs=cast(int, max_num_epochs)
+
+        logging.info("Building estimator")
 
         self.model = EstimatorNet(
             net=self.neural_net,
@@ -155,6 +157,8 @@ class RatioEstimator(NeuralInference, ABC):
 
         early_stop_callback = EarlyStopping(monitor='val_loss', patience=stop_after_epochs)        
         lr_monitor = LearningRateMonitor(logging_interval='epoch')
+
+        logging.info("Training")
 
         trainer = pl.Trainer(
             logger=self.summary_writer,

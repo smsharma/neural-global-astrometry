@@ -75,7 +75,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     theta_filename = "{}/samples/theta_{}.npy".format(data_dir, sample_name)
 
     # Embedding net (feature extractor)
-    sg_embed = SphericalGraphCNN(nside_list, indexes_list, kernel_size=kernel_size, laplacian_type=laplacian_type, n_aux=0, n_params=1, activation=activation, conv_source=conv_source, conv_type=conv_type, in_ch=2, n_neighbours=n_neighbours)
+    sg_embed = SphericalGraphCNN(nside_list, indexes_list, kernel_size=kernel_size, laplacian_type=laplacian_type, n_params=1, activation=activation, conv_source=conv_source, conv_type=conv_type, in_ch=2, n_neighbours=n_neighbours)
 
     # Instantiate the neural density estimator
     neural_classifier = utils.classifier_nn(model="mlp_mixed", embedding_net_x=sg_embed)
@@ -85,7 +85,6 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
 
     # Model training
     density_estimator = posterior_estimator.train(x=x_filename, 
-                                x_aux=x_aux_filename, 
                                 theta=theta_filename, 
                                 proposal=prior, 
                                 training_batch_size=batch_size, 
@@ -119,7 +118,7 @@ def parse_args():
     parser.add_argument("--activation", type=str, default='relu', help='Nonlinearity, "relu" or "selu"')
     parser.add_argument("--max_num_epochs", type=int, default=48, help="Max number of training epochs")
     parser.add_argument("--kernel_size", type=int, default=4, help="GNN  kernel size")
-    parser.add_argument("--batch_size", type=int, default=64, help="Training batch size")
+    parser.add_argument("--batch_size", type=int, default=32, help="Training batch size")
     parser.add_argument("--dir", type=str, default=".", help="Directory. Training data will be loaded from the data/samples subfolder, the model saved in the " "data/models subfolder.")
 
     # Training option
@@ -133,21 +132,6 @@ if __name__ == "__main__":
 
     args = parse_args()
 
-    if args.summary_range != "None":
-        args.summary_range = list(json.loads(args.summary_range))
-    else:
-        args.summary_range = None
-
-    if args.aux_summary == "None":
-        args.aux_summary = None 
-    else:
-        args.aux_summary = args.aux_summary.strip('][').split(',')
-
-    if args.fc_dims == "None":
-        args.fc_dims = None
-    else:
-        args.fc_dims = list(json.loads(args.fc_dims))
-
-    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, conv_channel_config=args.conv_channel_config, n_neighbours=args.n_neighbours)
+    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours)
 
     logging.info("All done! Have a nice day!")
