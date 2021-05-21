@@ -14,6 +14,9 @@ from torch.distributions import Independent, Uniform
 from sbi import utils as utils
 from sbi.types import Array, OneOrMore, ScalarFloat
 
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
 
 def process_device(device: str) -> str:
     """Set and return the default device to cpu or gpu."""
@@ -225,7 +228,7 @@ class BoxUniform(Independent):
                                              reinterpret as event dims.
         """
 
-        super().__init__(Uniform(low=low, high=high), reinterpreted_batch_ndims)
+        super().__init__(Uniform(low=low, high=high, validate_args=False), reinterpreted_batch_ndims)
 
 
 def ensure_theta_batched(theta: Tensor) -> Tensor:

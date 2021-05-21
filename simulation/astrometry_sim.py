@@ -181,7 +181,7 @@ class QuasarSim(SubhaloSample):
         self.mu_qsrs = np.zeros((self.n_qsrs, 2))
         self.alpha_qsrs = np.zeros((self.n_qsrs, 2))
 
-        for i_lens in self.tqdm_function(range(self.N_halos)):
+        for i_lens in self.tqdm_function(range(self.N_halos), disable=True):
 
             # Lens velocity
             self.pm_l_cosb_lens = self.coords_galactic.pm_l_cosb.value[i_lens]
