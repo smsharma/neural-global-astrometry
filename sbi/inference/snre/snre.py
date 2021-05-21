@@ -91,7 +91,6 @@ class RatioEstimator(NeuralInference, ABC):
     def train(
         self,
         x,
-        x_aux,
         theta,
         proposal,
         optimizer=optim.AdamW,
@@ -115,28 +114,24 @@ class RatioEstimator(NeuralInference, ABC):
         # Load data
         theta = self.load_and_check(theta, memmap=False)
         x = self.load_and_check(x, memmap=True)
-        x_aux = self.load_and_check(x_aux, memmap=False)
 
         data = OrderedDict()
         data["theta"] = theta
         data["x"] = x
-        data["x_aux"] = x_aux
         dataset = self.make_dataset(data)
 
         train_loader, val_loader = self.make_dataloaders(dataset, validation_fraction, training_batch_size)
 
-        num_z_score = 50000  # Z-score using a limited random sample for memory reasons
-        theta_z_score, x_z_score, x_aux_z_score = train_loader.dataset[:num_z_score]
+        num_z_score = 5000  # Z-score using a limited random sample for memory reasons
+        theta_z_score, x_z_score = train_loader.dataset[:num_z_score]
 
         logging.info("Z-scoring using {} random training samples for x".format(num_z_score))
-
-        x_and_aux_z_score = torch.cat([x_z_score, x_aux_z_score], -1)
 
         # Call the `self._build_neural_net` which will build the neural network.
         # This is passed into NeuralPosterior, to create a neural posterior which
         # can `sample()` and `log_prob()`. The network is accessible via `.net`.
-        self.neural_net = self._build_neural_net(theta_z_score, x_and_aux_z_score)
-        self.x_shape = x_shape_from_simulation(x_and_aux_z_score)
+        self.neural_net = self._build_neural_net(theta_z_score, x_z_score)
+        self.x_shape = x_shape_from_simulation(x_z_score)
 
         max_num_epochs=cast(int, max_num_epochs)
 

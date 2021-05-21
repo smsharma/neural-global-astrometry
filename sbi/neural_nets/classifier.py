@@ -71,10 +71,8 @@ def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z
         Neural network.
     """
     
-    batch_x_and_theta = torch.cat([batch_x.unsqueeze(1), batch_y], -1)
-
     # Infer the output dimensionalities of the embedding_net by making a forward pass.
-    x_numel = embedding_net_y(batch_x_and_theta[:1]).numel()
+    x_numel = embedding_net_y(batch_x, batch_y).numel()
 
     if additional_layers:
         neural_net = nn.Sequential(nn.Linear(x_numel, hidden_features), nn.BatchNorm1d(hidden_features), nn.ReLU(), nn.Linear(hidden_features, hidden_features), nn.BatchNorm1d(hidden_features), nn.ReLU(), nn.Linear(hidden_features, 1),)
