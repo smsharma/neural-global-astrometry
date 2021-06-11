@@ -14,7 +14,7 @@ class SphericalGraphCNN(nn.Module):
     """Spherical GCNN Autoencoder.
     """
 
-    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 2048], [2048, 512], [512, 32]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1):
+    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 128], [128, 128], [128, 64]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1, pooling_end="average"):
         """Initialization.
 
         Args:
@@ -27,6 +27,7 @@ class SphericalGraphCNN(nn.Module):
         self.n_params = n_params
 
         self.in_ch = in_ch
+        self.pooling_end = pooling_end
 
         # Specify convolutional part
 
@@ -41,7 +42,7 @@ class SphericalGraphCNN(nn.Module):
         else:
             raise NotImplementedError
         
-        conv_config = [(self.in_ch, 32), (32, 64), (64, 128), (128, 256)] + [(256, 256)] * (len(nside_list) - 4)
+        conv_config = [(self.in_ch, 16), (16, 32), (32, 64), (64, 128)] + [(128, 128)] * (len(nside_list) - 4)
 
         self.npix_init = hp.nside2npix(nside_list[0])
         self.npix_final = int(hp.nside2npix(nside_list[-1]) / 4)  # Number of pixels in final layers
@@ -63,7 +64,14 @@ class SphericalGraphCNN(nn.Module):
 
         if fc_dims is not None:
             # Set shape of first input of FC layers to correspond to output of conv layers + aux variables
-            fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_params)
+
+            if self.pooling_end == "flatten":
+                fc_dims[0][0] = conv_config[-1][-1] * self.npix_final + (self.n_params)
+            elif self.pooling_end == "average":
+                fc_dims[0][0] = conv_config[-1][-1] + (self.n_params)
+            else:
+                raise NotImplementedError
+
         
             for i, (in_ch, out_ch) in enumerate(fc_dims):
                 if i == len(fc_dims) - 1:  # No activation in final FC layer
@@ -91,10 +99,11 @@ class SphericalGraphCNN(nn.Module):
         for layer in self.cnn_layers:
             x_map = layer(x_map)
 
-        # Flatten before putting through convolutional layers
-        x_map = x_map.reshape(x_map.size(0), -1)
-
-        print("1", theta.shape, x_map.shape)
+        # Flatten or do average pooling before putting through full-connected layers
+        if self.pooling_end == "flatten":
+            x_map = x_map.reshape(x_map.size(0), -1)
+        elif self.pooling_end == "average":
+            x_map = x_map.mean([1])
 
         # Concatenate auxiliary variable along last dimension
         if (self.n_params != 0):

@@ -93,13 +93,14 @@ class RatioEstimator(NeuralInference, ABC):
         x,
         theta,
         proposal,
+        num_samples=None,
         optimizer=optim.AdamW,
         optimizer_kwargs=None,
         scheduler=optim.lr_scheduler.CosineAnnealingLR,
         scheduler_kwargs=None,
         training_batch_size: int = 50,
         initial_lr: float = 1e-3,
-        validation_fraction: float = 0.25,
+        validation_fraction: float = 0.15,
         stop_after_epochs: int = 20,
         max_num_epochs: Optional[int] = None,
         clip_max_norm: Optional[float] = 1.0,
@@ -112,8 +113,8 @@ class RatioEstimator(NeuralInference, ABC):
         max_num_epochs = 2 ** 31 - 1 if max_num_epochs is None else max_num_epochs
 
         # Load data
-        theta = self.load_and_check(theta, memmap=False)
-        x = self.load_and_check(x, memmap=True)
+        theta = self.load_and_check(theta, memmap=False, num_samples=num_samples)
+        x = self.load_and_check(x, memmap=True, num_samples=num_samples)
 
         data = OrderedDict()
         data["theta"] = theta

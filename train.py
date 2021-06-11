@@ -25,7 +25,7 @@ from pytorch_lightning.loggers import TensorBoardLogger, MLFlowLogger
 import mlflow
 
 
-def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=8, clip_max_norm=1., validation_fraction=0.2, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv"):
+def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None):
 
     # Cache hyperparameters to log
     params_to_log = locals()
@@ -71,7 +71,6 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     # Specify datasets
 
     x_filename = "{}/samples/x_{}.npy".format(data_dir, sample_name)
-    x_aux_filename = "{}/samples/x_aux_{}.npy".format(data_dir, sample_name)
     theta_filename = "{}/samples/theta_{}.npy".format(data_dir, sample_name)
 
     # Embedding net (feature extractor)
@@ -86,6 +85,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     # Model training
     density_estimator = posterior_estimator.train(x=x_filename, 
                                 theta=theta_filename, 
+                                num_samples=num_samples,
                                 proposal=prior, 
                                 training_batch_size=batch_size, 
                                 max_num_epochs=max_num_epochs, 
@@ -103,7 +103,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     # Check to make sure model can be succesfully loaded
     model_uri = "runs:/{}/density_estimator".format(mlf_logger.run_id)
     density_estimator = mlflow.pytorch.load_model(model_uri)
-    posterior = posterior_estimator.build_posterior(density_estimator)
+    posterior = posterior_estimator._posterior(density_estimator)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="High-level script for the training of the neural likelihood ratio estimators")
@@ -111,14 +111,15 @@ def parse_args():
     # Main options
     parser.add_argument("--sample", type=str, help='Sample name, like "train"')
     parser.add_argument("--name", type=str, default='test', help='Experiment name')
-    parser.add_argument("--laplacian_type", type=str, default='normalized', help='"normalized" or "combinatorial" Laplacian')
+    parser.add_argument("--laplacian_type", type=str, default='combinatorial', help='"normalized" or "combinatorial" Laplacian')
     parser.add_argument("--conv_source", type=str, default='deepsphere', help='Use "deepsphere" or "geometric" implementation of ChebConv layer')
     parser.add_argument("--conv_type", type=str, default='chebconv', help='Use "chebconv" or "gcn" graph convolution layers')
     parser.add_argument("--n_neighbours", type=int, default=8, help="Number of neightbours in graph.")
     parser.add_argument("--activation", type=str, default='relu', help='Nonlinearity, "relu" or "selu"')
-    parser.add_argument("--max_num_epochs", type=int, default=48, help="Max number of training epochs")
+    parser.add_argument("--max_num_epochs", type=int, default=50, help="Max number of training epochs")
     parser.add_argument("--kernel_size", type=int, default=4, help="GNN  kernel size")
-    parser.add_argument("--batch_size", type=int, default=32, help="Training batch size")
+    parser.add_argument("--batch_size", type=int, default=64, help="Training batch size")
+    parser.add_argument("--num_samples", type=int, default=-1, help="Number of samples to load")
     parser.add_argument("--dir", type=str, default=".", help="Directory. Training data will be loaded from the data/samples subfolder, the model saved in the " "data/models subfolder.")
 
     # Training option
@@ -132,6 +133,9 @@ if __name__ == "__main__":
 
     args = parse_args()
 
-    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours)
+    if args.num_samples == -1:
+        args.num_samples = None
+
+    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours, num_samples=args.num_samples)
 
     logging.info("All done! Have a nice day!")

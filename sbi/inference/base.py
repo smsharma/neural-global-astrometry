@@ -63,7 +63,6 @@ class EstimatorNet(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         theta, x = batch
-        print("1", theta.shape, x.shape)
         loss = torch.mean(self.loss(theta, x, self.proposal))
         self.log('val_loss', loss, on_epoch=True)
 
@@ -123,7 +122,7 @@ class NeuralInference(ABC):
         return dataset
 
     @staticmethod
-    def make_dataloaders(dataset, validation_split, batch_size, num_workers=32, pin_memory=True, seed=None):
+    def make_dataloaders(dataset, validation_split, batch_size, num_workers=16, pin_memory=True, seed=None):
         if validation_split is None or validation_split <= 0.0:
             train_loader = DataLoader(
                 dataset,
@@ -167,13 +166,13 @@ class NeuralInference(ABC):
         return train_loader, val_loader
 
     @staticmethod
-    def load_and_check(filename, memmap=False):
+    def load_and_check(filename, num_samples=None, memmap=False):
         # Don't load image files > 1 GB into memory
         # if memmap and os.stat(filename).st_size > 1.0 * 1024 ** 3:
         if memmap:
-            data = np.load(filename, mmap_mode="c")
+            data = np.load(filename, mmap_mode="c")[:num_samples]
         else:
-            data = np.load(filename)
+            data = np.load(filename)[:num_samples]
 
         return data
 
@@ -205,7 +204,7 @@ class NumpyDataset(Dataset):
         for memmap, array in zip(self.memmap, self.data):
             if memmap:
                 tensor = np.array(array[index])
-                items.append(torch.from_numpy(tensor).to(self.dtype))
+                items.append(torch.from_numpy(tensor  + np.random.normal(loc=0, scale=0.0022 / 1., size=tensor.shape)).to(self.dtype))
             else:
                 items.append(array[index])
         return tuple(items)

@@ -34,8 +34,8 @@ class StandardizeInputs(nn.Module):
         theta = self.standardizing_net_x(theta)
         theta = self.embedding_net_x(theta)
 
-        if len(theta.shape) != len(x.shape):
-            theta = theta.unsqueeze(1)
+        # if len(theta.shape) != len(x.shape):
+        #     theta = theta.unsqueeze(1)
         
         x = self.embedding_net_y(x, theta)
         
@@ -51,7 +51,7 @@ class SequentialMulti(nn.Sequential):
         return inputs
 
 
-def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z_score_x: bool = True, z_score_y: bool = True, hidden_features: int = 50, embedding_net_x: nn.Module = nn.Identity(), embedding_net_y: nn.Module = nn.Identity(), additional_layers: bool = True) -> nn.Module:
+def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z_score_x: bool = True, z_score_y: bool = True, embedding_net_x: nn.Module = nn.Identity(), embedding_net_y: nn.Module = nn.Identity()) -> nn.Module:
     """Builds MLP classifier.
 
     In SNRE, the classifier will receive batches of thetas and xs.
@@ -70,12 +70,9 @@ def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z
     """
     
     # Infer the output dimensionalities of the embedding_net by making a forward pass.
-    x_numel = embedding_net_y(batch_y, batch_x).numel()
+    x_numel = embedding_net_y(batch_y[:1], batch_x[:1]).numel()
 
-    if additional_layers:
-        neural_net = nn.Sequential(nn.Linear(x_numel, hidden_features), nn.BatchNorm1d(hidden_features), nn.ReLU(), nn.Linear(hidden_features, hidden_features), nn.BatchNorm1d(hidden_features), nn.ReLU(), nn.Linear(hidden_features, 1),)
-    else:
-        neural_net = nn.Sequential(nn.ReLU(), nn.Linear(x_numel, 1),)
+    neural_net = nn.Sequential(nn.ReLU(), nn.Linear(x_numel, 1),)
 
     input_layer = StandardizeInputs(embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x=z_score_x, z_score_y=z_score_y)
     neural_net = SequentialMulti(input_layer, neural_net)

@@ -15,7 +15,7 @@ def classifier_nn(
     model: str,
     z_score_theta: bool = True,
     z_score_x: bool = True,
-    hidden_features: int = 50,
+    # hidden_features: int = 50,
     embedding_net_theta: nn.Module = nn.Identity(),
     embedding_net_x: nn.Module = nn.Identity(),
 ) -> Callable:
@@ -44,14 +44,14 @@ def classifier_nn(
             (
                 "z_score_x",
                 "z_score_y",
-                "hidden_features",
+                # "hidden_features",
                 "embedding_net_y",
                 "embedding_net_x",
             ),
             (
                 z_score_x,
                 z_score_theta,
-                hidden_features,
+                # hidden_features,
                 embedding_net_x,
                 embedding_net_theta,
             ),
