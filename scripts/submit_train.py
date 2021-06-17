@@ -21,13 +21,13 @@ cd /scratch/sm8383/sbi-astrometry/
 # Explore configurations #
 ##########################
 
-batch_size_list = [128]
+batch_size_list = [256]
 activations = ["relu"]
 kernel_size_list = [4]
 n_neighbours_list = [8]
 laplacian_types = ["combinatorial"]
 conv_types = ["chebconv"]
-conv_source_list = ["deepsphere", "geometric"]
+conv_source_list = ["deepsphere"]
 
 for n_neighbours in n_neighbours_list:
     for batch_size in batch_size_list:
@@ -37,7 +37,7 @@ for n_neighbours in n_neighbours_list:
                     for conv_type in conv_types:
                         for conv_source in conv_source_list:
                             batchn = batch + "\n"
-                            batchn += "python -u train.py --sample train --name prototype --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {}".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source)
+                            batchn += "python -u train.py --sample train --name prototype_smaller_noise --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {}".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source)
                             fname = "batch/submit.batch"
                             f = open(fname, "w")
                             f.write(batchn)

@@ -112,13 +112,14 @@ class NeuralInference(ABC):
         self.summary_writer =  summary_writer
 
     @staticmethod
-    def make_dataset(data):
+    def make_dataset(data, sigma_noise=None):
         data_arrays = []
         data_labels = []
         for key, value in six.iteritems(data):
             data_labels.append(key)
             data_arrays.append(value)
-        dataset = NumpyDataset(*data_arrays, dtype=torch.float)  # Should maybe mod dtype
+
+        dataset = NumpyDataset(*data_arrays, sigma_noise=sigma_noise, dtype=torch.float)  # Should maybe mod dtype
         return dataset
 
     @staticmethod
@@ -152,7 +153,6 @@ class NeuralInference(ABC):
                 batch_size=batch_size,
                 pin_memory=pin_memory,
                 num_workers=num_workers,
-                # worker_init_fn=seed_worker
             ) 
             val_loader = DataLoader(
                 dataset,
@@ -160,7 +160,6 @@ class NeuralInference(ABC):
                 batch_size=batch_size,
                 pin_memory=pin_memory,
                 num_workers=num_workers,
-                # worker_init_fn=seed_worker
             )  
 
         return train_loader, val_loader
@@ -180,11 +179,13 @@ class NeuralInference(ABC):
 class NumpyDataset(Dataset):
     """ Dataset for numpy arrays with explicit memmap support """
 
-    def __init__(self, *arrays, dtype=torch.float):
+    def __init__(self, *arrays, sigma_noise=None, dtype=torch.float):
         self.dtype = dtype
         self.memmap = []
         self.data = []
         self.n = None
+
+        self.sigma_noise = sigma_noise
 
         for array in arrays:
             if self.n is None:
@@ -204,7 +205,11 @@ class NumpyDataset(Dataset):
         for memmap, array in zip(self.memmap, self.data):
             if memmap:
                 tensor = np.array(array[index])
-                items.append(torch.from_numpy(tensor  + np.random.normal(loc=0, scale=0.0022 / 1., size=tensor.shape)).to(self.dtype))
+                if self.sigma_noise is not None:
+                    items.append(torch.from_numpy(tensor  + np.random.normal(loc=0, scale=self.sigma_noise, size=tensor.shape)).to(self.dtype))
+                else:
+                    items.append(torch.from_numpy(tensor).to(self.dtype))
+
             else:
                 items.append(array[index])
         return tuple(items)
