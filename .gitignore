@@ -15,7 +15,8 @@ sbi-logs
 psf_dir
 
 *.tfevents*
-ta and temporary notebooks
+
+# Data and temporary notebooks
 # *.npy
 # *.npz
 *.ipynb_checkpoints
@@ -26,6 +27,7 @@ samples/
 data/samples/*
 data/models/*
 data/quasars_phot.csv
+data/*49.npy
 
 # Tex
 *.aux
