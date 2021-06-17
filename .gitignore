@@ -25,7 +25,7 @@ ta and temporary notebooks
 samples/
 data/samples/*
 data/models/*
-data/quasar_phot.csv
+data/quasars_phot.csv
 
 # Tex
 *.aux
