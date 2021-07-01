@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 batch = """#!/bin/bash
 
@@ -28,6 +29,7 @@ n_neighbours_list = [8]
 laplacian_types = ["combinatorial"]
 conv_types = ["chebconv"]
 conv_source_list = ["deepsphere"]
+sigma_noise_list = np.linspace(0.0002, 0.005, 10)
 
 for n_neighbours in n_neighbours_list:
     for batch_size in batch_size_list:
@@ -36,11 +38,12 @@ for n_neighbours in n_neighbours_list:
                 for laplacian_type in laplacian_types:
                     for conv_type in conv_types:
                         for conv_source in conv_source_list:
-                            batchn = batch + "\n"
-                            batchn += "python -u train.py --sample train --name prototype_smaller_noise --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {}".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source)
-                            fname = "batch/submit.batch"
-                            f = open(fname, "w")
-                            f.write(batchn)
-                            f.close()
-                            os.system("chmod +x " + fname)
-                            os.system("sbatch " + fname)
+                            for sigma_noise in sigma_noise_list:
+                                batchn = batch + "\n"
+                                batchn += "python -u train.py --sample train --name vary_noise --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {} --sigma_noise {}".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source, sigma_noise)
+                                fname = "batch/submit.batch"
+                                f = open(fname, "w")
+                                f.write(batchn)
+                                f.close()
+                                os.system("chmod +x " + fname)
+                                os.system("sbatch " + fname)

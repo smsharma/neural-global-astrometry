@@ -77,7 +77,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     sg_embed = SphericalGraphCNN(nside_list, indexes_list, kernel_size=kernel_size, laplacian_type=laplacian_type, n_params=1, activation=activation, conv_source=conv_source, conv_type=conv_type, in_ch=2, n_neighbours=n_neighbours)
 
     # Instantiate the neural density estimator
-    neural_classifier = utils.classifier_nn(model="mlp_mixed", embedding_net_x=sg_embed)
+    neural_classifier = utils.classifier_nn(model="mlp_mixed", embedding_net_x=sg_embed, sigma_noise=sigma_noise)
 
     # Setup the inference procedure with NPE
     posterior_estimator = RatioEstimator(prior=prior, classifier=neural_classifier, show_progress_bars=True, logging_level="INFO", device=device.type, summary_writer=mlf_logger)
@@ -94,7 +94,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
                                 validation_fraction=validation_fraction,
                                 initial_lr=initial_lr,
                                 optimizer_kwargs=optimizer_kwargs,
-                                sigma_noise=sigma_noise)
+                                )
     
     # Save density estimator
     mlflow.set_tracking_uri(tracking_uri)

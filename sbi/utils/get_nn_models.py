@@ -18,6 +18,7 @@ def classifier_nn(
     # hidden_features: int = 50,
     embedding_net_theta: nn.Module = nn.Identity(),
     embedding_net_x: nn.Module = nn.Identity(),
+    sigma_noise: float = 0.,
 ) -> Callable:
     r"""
     Returns a function that builds a classifier for learning density ratios.
@@ -47,6 +48,7 @@ def classifier_nn(
                 # "hidden_features",
                 "embedding_net_y",
                 "embedding_net_x",
+                "sigma_noise",
             ),
             (
                 z_score_x,
@@ -54,6 +56,7 @@ def classifier_nn(
                 # hidden_features,
                 embedding_net_x,
                 embedding_net_theta,
+                sigma_noise,
             ),
         )
     )

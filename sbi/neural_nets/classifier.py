@@ -7,14 +7,42 @@ from torch import Tensor, nn
 from sbi.utils.sbiutils import standardizing_net
 
 
+class GaussianNoise(nn.Module):
+    """Gaussian noise regularizer.
+
+    Args:
+        sigma (float, optional): relative standard deviation used to generate the
+            noise. Relative means that it will be multiplied by the magnitude of
+            the value your are adding the noise to. This means that sigma can be
+            the same regardless of the scale of the vector.
+        is_relative_detach (bool, optional): whether to detach the variable before
+            computing the scale of the noise. If `False` then the scale of the noise
+            won't be seen as a constant but something to optimize: this will bias the
+            network to generate vectors with smaller values.
+    """
+    def __init__(self, sigma=0.):
+        super().__init__()
+        self.sigma = sigma
+        self.register_buffer('noise', torch.tensor(0))
+
+    def forward(self, x):
+        if self.sigma != 0.:
+            sampled_noise = self.noise.expand(*x.size()).detach().float().normal_() * self.sigma
+            x = x + sampled_noise
+        return x 
+        
+
+
 class StandardizeInputs(nn.Module):
-    def __init__(self, embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x, z_score_y):
+    def __init__(self, embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x, z_score_y, sigma_noise=0.):
         super().__init__()
         self.embedding_net_x = embedding_net_x
         self.embedding_net_y = embedding_net_y
 
         self.batch_x = batch_x
         self.batch_y = batch_y
+
+        self.add_noise = GaussianNoise(sigma_noise)
         
         if z_score_x:
             self.standardizing_net_x = standardizing_net(batch_x)
@@ -22,20 +50,19 @@ class StandardizeInputs(nn.Module):
             self.standardizing_net_x = nn.Identity()
 
         if z_score_y:
-            self.standardizing_net_y = standardizing_net(batch_y)
+            self.standardizing_net_y = standardizing_net(self.add_noise(batch_y))
         else: 
             self.standardizing_net_y = nn.Identity()
 
-
-    def forward(self, x, theta):
+    def forward(self, x, theta, add_noise=True):
         
+        if add_noise:
+            x = self.add_noise(x)
+
         x = self.standardizing_net_y(x)
 
         theta = self.standardizing_net_x(theta)
         theta = self.embedding_net_x(theta)
-
-        # if len(theta.shape) != len(x.shape):
-        #     theta = theta.unsqueeze(1)
         
         x = self.embedding_net_y(x, theta)
         
@@ -51,7 +78,7 @@ class SequentialMulti(nn.Sequential):
         return inputs
 
 
-def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z_score_x: bool = True, z_score_y: bool = True, embedding_net_x: nn.Module = nn.Identity(), embedding_net_y: nn.Module = nn.Identity()) -> nn.Module:
+def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z_score_x: bool = True, z_score_y: bool = True, embedding_net_x: nn.Module = nn.Identity(), embedding_net_y: nn.Module = nn.Identity(), sigma_noise: float = 0.) -> nn.Module:
     """Builds MLP classifier.
 
     In SNRE, the classifier will receive batches of thetas and xs.
@@ -74,7 +101,8 @@ def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z
 
     neural_net = nn.Sequential(nn.ReLU(), nn.Linear(x_numel, 1),)
 
-    input_layer = StandardizeInputs(embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x=z_score_x, z_score_y=z_score_y)
+    input_layer = StandardizeInputs(embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x=z_score_x, z_score_y=z_score_y, sigma_noise=sigma_noise)
+
     neural_net = SequentialMulti(input_layer, neural_net)
 
     return neural_net

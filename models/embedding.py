@@ -72,7 +72,6 @@ class SphericalGraphCNN(nn.Module):
             else:
                 raise NotImplementedError
 
-        
             for i, (in_ch, out_ch) in enumerate(fc_dims):
                 if i == len(fc_dims) - 1:  # No activation in final FC layer
                     layer = nn.Sequential(nn.Linear(in_ch, out_ch))
