@@ -104,7 +104,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     # Check to make sure model can be succesfully loaded
     model_uri = "runs:/{}/density_estimator".format(mlf_logger.run_id)
     density_estimator = mlflow.pytorch.load_model(model_uri)
-    posterior = posterior_estimator._posterior(density_estimator)
+    posterior = posterior_estimator.build_posterior(density_estimator)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="High-level script for the training of the neural likelihood ratio estimators")

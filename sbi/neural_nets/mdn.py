@@ -43,4 +43,4 @@ def build_mdn(batch_x: Tensor = None, batch_y: Tensor = None, z_score_x: bool = 
 
     neural_net = flows.Flow(transform, distribution, embedding_net)
 
-    return neural_net
+    return neural_net            
