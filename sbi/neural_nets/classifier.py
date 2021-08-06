@@ -15,10 +15,6 @@ class GaussianNoise(nn.Module):
             noise. Relative means that it will be multiplied by the magnitude of
             the value your are adding the noise to. This means that sigma can be
             the same regardless of the scale of the vector.
-        is_relative_detach (bool, optional): whether to detach the variable before
-            computing the scale of the noise. If `False` then the scale of the noise
-            won't be seen as a constant but something to optimize: this will bias the
-            network to generate vectors with smaller values.
     """
     def __init__(self, sigma=0.):
         super().__init__()
@@ -31,7 +27,6 @@ class GaussianNoise(nn.Module):
             x = x + sampled_noise
         return x 
         
-
 
 class StandardizeInputs(nn.Module):
     def __init__(self, embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x, z_score_y, sigma_noise=0.):
