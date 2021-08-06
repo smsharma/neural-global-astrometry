@@ -7,7 +7,7 @@ batch = """#!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=32GB
-#SBATCH --time=23:59:00
+#SBATCH --time=35:59:00
 #SBATCH --gres=gpu:1
 ##SBATCH --mail-type=begin
 #SBATCH --mail-type=end
@@ -22,14 +22,14 @@ cd /scratch/sm8383/sbi-astrometry/
 # Explore configurations #
 ##########################
 
-batch_size_list = [256]
+batch_size_list = [64]
 activations = ["relu"]
-kernel_size_list = [4]
+kernel_size_list = [5]
 n_neighbours_list = [8]
 laplacian_types = ["combinatorial"]
 conv_types = ["chebconv"]
 conv_source_list = ["deepsphere"]
-sigma_noise_list = np.linspace(0.0002, 0.005, 10)
+sigma_noise_list = np.linspace(0.0002, 0.003, 5)
 
 for n_neighbours in n_neighbours_list:
     for batch_size in batch_size_list:
