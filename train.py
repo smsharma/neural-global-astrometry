@@ -25,7 +25,7 @@ from pytorch_lightning.loggers import TensorBoardLogger, MLFlowLogger
 import mlflow
 
 
-def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, fc_dims=[[-1, 128], [128, 128], [128, 64]]):
+def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, fc_dims=[[-1, 128], [128, 128], [128, 64]], truncate_conv=None):
 
     # Cache hyperparameters to log
     params_to_log = locals()
@@ -57,6 +57,10 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
         indexes_list.append(np.arange(hp.nside2npix(nside))[~hp_mask])
     
     hp_mask_nside1 = hp.reorder(hp_mask_nside1, r2n=True)  # Switch to NESTED pixel order as that's required for DeepSphere batchnorm
+
+    if truncate_conv is not None:
+        indexes_list = indexes_list[:truncate_conv]
+        nside_list = nside_list[:truncate_conv]
 
     # Priors hard-coded for now
 
