@@ -1,0 +1,92 @@
+\documentclass[]{article}
+
+\PassOptionsToPackage{numbers,compress}{natbib}
+
+\usepackage[preprint]{neurips_2020_ml4ps}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}    
+\usepackage{hyperref}       
+\usepackage{url}            
+\usepackage{booktabs}       
+\usepackage{nicefrac}       
+\usepackage{microtype}      
+\usepackage{amsfonts,amsmath,amssymb}	
+\usepackage{mathtools}
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{linkcolor}{rgb}{0.7752941176470588, 0.22078431372549023, 0.2262745098039215}
+\hypersetup{colorlinks=true,
+linkcolor=linkcolor,
+citecolor=linkcolor,
+urlcolor=linkcolor,
+linktocpage=true,
+pdfproducer=medialab,
+}
+
+\title{Inferring dark matter substructure with \\ global astrometry beyond the power spectrum}
+
+\author{
+Siddharth Mishra-Sharma, \ldots \\
+New York University \\
+\texttt{sm8383@nyu.edu} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Abstract goes here 
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+
+\section{Model and inference}
+\label{sec:model}
+
+\paragraph{Template regression}
+
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=0.98\textwidth]{figures/inference}
+% \caption{\emph{(Top left)} Pixel-wise 95\% highest-posterior density interval (blue band) and median (blue line) of the GP posterior-predictive distribution, along with the true multiplicative modeling between the Model O (in simulation) and \texttt{p6v11} (in fit) diffuse background models (red line). Pixel indices cross the map left to right, starting from the top. The inset shows a zoomed-in region closest to the Galactic Center $(l, b) = (0^\circ, 0^\circ)$. The Gaussian process is seen to faithfully describe uncertainty in the diffuse model on larger scales. \emph{(Top right)} The median inferred map of multiplicative mismodeling in the analysis region of interest. \emph{(Bottom row)} Samples from the posterior-predictive distributions of the Poissonian template normalizations (blue histograms) and the corresponding ground truths (vertical red lines).}
+% \label{fig:experiment}
+% \end{figure}
+
+\section{Tests on simulated data}
+\label{sec:experiments}
+
+
+\section{Conclusions and outlook}
+\label{sec:conclusions}
+
+Code and data used for reproducing the results presented in this paper is available at \url{https://github.com/smsharma/sbi-astrometry}.
+
+\section*{Broader Impact}
+\label{sec:impact}
+
+% Accounting for epistemic uncertainty is crucial for making robust conclusions from data in machine learning applications. This work is part of the broader scientific effort to design and implement techniques that attempt to incorporate deficiencies in our ability to model consequential aspects of real-world data in a principled manner.
+
+We acknowledge the importance of considering the ethical implications of scientific research in general, and machine learning research in particular, as well as of placing both the process and output of scientific research in a broader societal context. We do not believe the present work presents any issues in this regard. 
+
+\begin{ack}
+This research has made use of NASA's Astrophysics Data System. This research made use of the Astropy~\cite{Robitaille:2013mpa,Price-Whelan:2018hus},
+GPyTorch~\cite{gardner2018gpytorch},
+HEALPix~\cite{Gorski:2004by,Zonca2019},
+IPython~\cite{PER-GRA:2007},
+Jupyter~\cite{Kluyver2016JupyterN},
+Matplotlib~\cite{Hunter:2007},
+NumPy~\cite{harris_array_2020},
+Pyro~\cite{bingham2019pyro},
+PyTorch~\cite{NEURIPS2019_9015},
+SciPy~\cite{2020SciPy-NMeth}, and
+Seaborn~\cite{michael_waskom_2017_883859}
+software packages.
+\end{ack}
+
+\bibliographystyle{apsrev4-1-mod}
+\bibliography{sbi-astrometry}
+
+\end{document}

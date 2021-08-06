@@ -42,7 +42,7 @@ class StandardizeInputs(nn.Module):
         self.batch_x = batch_x
         self.batch_y = batch_y
 
-        self.add_noise = GaussianNoise(sigma_noise)
+#         self.add_noise = GaussianNoise(sigma_noise)
         
         if z_score_x:
             self.standardizing_net_x = standardizing_net(batch_x)
@@ -56,8 +56,8 @@ class StandardizeInputs(nn.Module):
 
     def forward(self, x, theta, add_noise=True):
         
-        if add_noise:
-            x = self.add_noise(x)
+#         if add_noise:
+#             x = self.add_noise(x)
 
         x = self.standardizing_net_y(x)
 
