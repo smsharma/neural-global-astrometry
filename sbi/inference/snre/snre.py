@@ -101,7 +101,7 @@ class RatioEstimator(NeuralInference, ABC):
         training_batch_size: int = 50,
         initial_lr: float = 1e-3,
         validation_fraction: float = 0.15,
-        stop_after_epochs: int = 20,
+        stop_after_epochs: int = 8,
         max_num_epochs: Optional[int] = None,
         clip_max_norm: Optional[float] = 1.0,
     ) -> RatioBasedPosterior:
