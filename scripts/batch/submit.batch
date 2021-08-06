@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=32GB
-#SBATCH --time=23:59:00
+#SBATCH --time=35:59:00
 #SBATCH --gres=gpu:1
 ##SBATCH --mail-type=begin
 #SBATCH --mail-type=end
@@ -14,4 +14,4 @@ source ~/.bashrc
 conda activate sbi-fermi
 cd /scratch/sm8383/sbi-astrometry/
 
-python -u train.py --sample train --name vary_noise --batch_size 256 --activation relu --kernel_size 4 --laplacian_type combinatorial --conv_type chebconv --n_neighbours 8 --conv_source deepsphere --sigma_noise 0.005
+python -u train.py --sample train --name vary_noise --batch_size 64 --activation relu --kernel_size 5 --laplacian_type combinatorial --conv_type chebconv --n_neighbours 8 --conv_source deepsphere --sigma_noise 0.003

@@ -1,0 +1,48 @@
+   | Name                                                  | Type                | Params
+-----------------------------------------------------------------------------------------------
+0  | net                                                   | SequentialMulti     | 434 K 
+1  | net.0                                                 | StandardizeInputs   | 434 K 
+2  | net.0.embedding_net_x                                 | Identity            | 0     
+3  | net.0.embedding_net_y                                 | SphericalGraphCNN   | 434 K 
+4  | net.0.embedding_net_y.activation_function             | ReLU                | 0     
+5  | net.0.embedding_net_y.layer_0                         | SphericalChebBNPool | 336   
+6  | net.0.embedding_net_y.layer_0.spherical_cheb          | SphericalChebConv   | 304   
+7  | net.0.embedding_net_y.layer_0.spherical_cheb.chebconv | ChebConv            | 304   
+8  | net.0.embedding_net_y.layer_0.pooling                 | HealpixMaxPool      | 0     
+9  | net.0.embedding_net_y.layer_0.batchnorm               | BatchNorm1d         | 32    
+10 | net.0.embedding_net_y.layer_1                         | SphericalChebBNPool | 4.7 K 
+11 | net.0.embedding_net_y.layer_1.spherical_cheb          | SphericalChebConv   | 4.6 K 
+12 | net.0.embedding_net_y.layer_1.spherical_cheb.chebconv | ChebConv            | 4.6 K 
+13 | net.0.embedding_net_y.layer_1.batchnorm               | BatchNorm1d         | 64    
+14 | net.0.embedding_net_y.layer_2                         | SphericalChebBNPool | 18.6 K
+15 | net.0.embedding_net_y.layer_2.spherical_cheb          | SphericalChebConv   | 18.5 K
+16 | net.0.embedding_net_y.layer_2.spherical_cheb.chebconv | ChebConv            | 18.5 K
+17 | net.0.embedding_net_y.layer_2.batchnorm               | BatchNorm1d         | 128   
+18 | net.0.embedding_net_y.layer_3                         | SphericalChebBNPool | 74.1 K
+19 | net.0.embedding_net_y.layer_3.spherical_cheb          | SphericalChebConv   | 73.9 K
+20 | net.0.embedding_net_y.layer_3.spherical_cheb.chebconv | ChebConv            | 73.9 K
+21 | net.0.embedding_net_y.layer_3.batchnorm               | BatchNorm1d         | 256   
+22 | net.0.embedding_net_y.layer_4                         | SphericalChebBNPool | 147 K 
+23 | net.0.embedding_net_y.layer_4.spherical_cheb          | SphericalChebConv   | 147 K 
+24 | net.0.embedding_net_y.layer_4.spherical_cheb.chebconv | ChebConv            | 147 K 
+25 | net.0.embedding_net_y.layer_4.batchnorm               | BatchNorm1d         | 256   
+26 | net.0.embedding_net_y.layer_5                         | SphericalChebBNPool | 147 K 
+27 | net.0.embedding_net_y.layer_5.spherical_cheb          | SphericalChebConv   | 147 K 
+28 | net.0.embedding_net_y.layer_5.spherical_cheb.chebconv | ChebConv            | 147 K 
+29 | net.0.embedding_net_y.layer_5.batchnorm               | BatchNorm1d         | 256   
+30 | net.0.embedding_net_y.layer_fc_0                      | Sequential          | 16.6 K
+31 | net.0.embedding_net_y.layer_fc_0.0                    | Linear              | 16.6 K
+32 | net.0.embedding_net_y.layer_fc_1                      | Sequential          | 16.5 K
+33 | net.0.embedding_net_y.layer_fc_1.0                    | Linear              | 16.5 K
+34 | net.0.embedding_net_y.layer_fc_2                      | Sequential          | 8.3 K 
+35 | net.0.embedding_net_y.layer_fc_2.0                    | Linear              | 8.3 K 
+36 | net.0.standardizing_net_x                             | Standardize         | 0     
+37 | net.0.standardizing_net_y                             | Standardize         | 0     
+38 | net.1                                                 | Sequential          | 65    
+39 | net.1.0                                               | ReLU                | 0     
+40 | net.1.1                                               | Linear              | 65    
+-----------------------------------------------------------------------------------------------
+434 K     Trainable params
+0         Non-trainable params
+434 K     Total params
+1.740     Total estimated model params size (MB)
