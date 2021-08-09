@@ -25,7 +25,11 @@ from pytorch_lightning.loggers import TensorBoardLogger, MLFlowLogger
 import mlflow
 
 
+<<<<<<< HEAD
 def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, numpy_noise=False):
+=======
+def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, fc_dims=[[-1, 128], [128, 128], [128, 64]], truncate_conv=None):
+>>>>>>> 0d383a97b6e013488246a226286ceab1fe9e77f2
 
     # Cache hyperparameters to log
     params_to_log = locals()
@@ -58,6 +62,10 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     
     hp_mask_nside1 = hp.reorder(hp_mask_nside1, r2n=True)  # Switch to NESTED pixel order as that's required for DeepSphere batchnorm
 
+    if truncate_conv is not None:
+        indexes_list = indexes_list[:truncate_conv]
+        nside_list = nside_list[:truncate_conv]
+
     # Priors hard-coded for now
 
     # Combine priors
@@ -74,7 +82,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
     theta_filename = "{}/samples/theta_{}.npy".format(data_dir, sample_name)
 
     # Embedding net (feature extractor)
-    sg_embed = SphericalGraphCNN(nside_list, indexes_list, kernel_size=kernel_size, laplacian_type=laplacian_type, n_params=1, activation=activation, conv_source=conv_source, conv_type=conv_type, in_ch=2, n_neighbours=n_neighbours)
+    sg_embed = SphericalGraphCNN(nside_list, indexes_list, kernel_size=kernel_size, laplacian_type=laplacian_type, n_params=1, activation=activation, conv_source=conv_source, conv_type=conv_type, in_ch=2, n_neighbours=n_neighbours, fc_dims=fc_dims)
 
     # Instantiate the neural density estimator
     neural_classifier = utils.classifier_nn(model="mlp_mixed", embedding_net_x=sg_embed, sigma_noise=sigma_noise)
@@ -125,6 +133,8 @@ def parse_args():
     parser.add_argument("--numpy_noise", type=int, default=0, help="Add noise while making dataset")
     parser.add_argument("--sigma_noise", type=float, default=0.0022, help="Noise added to dataset")
     parser.add_argument("--dir", type=str, default=".", help="Directory. Training data will be loaded from the data/samples subfolder, the model saved in the " "data/models subfolder.")
+    parser.add_argument("--fc_dims", type=str, default="[[-1, 128], [128, 128], [128, 64]]", help='Specification of fully-connected embedding layers')
+
 
     # Training option
     return parser.parse_args()
@@ -140,6 +150,15 @@ if __name__ == "__main__":
     if args.num_samples == -1:
         args.num_samples = None
 
+<<<<<<< HEAD
     train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours, num_samples=args.num_samples, sigma_noise=args.sigma_noise, numpy_noise=args.numpy_noise)
+=======
+    if args.fc_dims == "None":
+        args.fc_dims = None
+    else:
+        args.fc_dims = list(json.loads(args.fc_dims))
+
+    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours, num_samples=args.num_samples, sigma_noise=args.sigma_noise, fc_dims=args.fc_dims)
+>>>>>>> 0d383a97b6e013488246a226286ceab1fe9e77f2
 
     logging.info("All done! Have a nice day!")

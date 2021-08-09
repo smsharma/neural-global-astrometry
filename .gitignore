@@ -11,6 +11,10 @@
 mlruns
 .mlruns
 
+mlruns_bkp
+mlruns*
+.mlruns*
+
 sbi-logs
 psf_dir
 

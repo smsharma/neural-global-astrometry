@@ -96,12 +96,14 @@ def standardizing_net(batch_t: Tensor, min_std: float = 1e-7) -> nn.Module:
 
     is_valid_t, *_ = handle_invalid_x(batch_t, True)
 
-    t_mean = torch.mean(batch_t[is_valid_t, :, :])
+    # TODO: Normalize each channel separately?
+
+    t_mean = torch.mean(batch_t[is_valid_t])
 
     if len(batch_t > 1):
         # t_std = torch.std(batch_t[is_valid_t], dim=0)
         # t_std[t_std < min_std] = min_std
-        t_std = torch.std(batch_t[is_valid_t, :, :])
+        t_std = torch.std(batch_t[is_valid_t])
     else:
         t_std = 1
         logging.warning(
