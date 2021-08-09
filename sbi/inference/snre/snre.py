@@ -104,6 +104,7 @@ class RatioEstimator(NeuralInference, ABC):
         stop_after_epochs: int = 8,
         max_num_epochs: Optional[int] = None,
         clip_max_norm: Optional[float] = 1.0,
+        numpy_noise=False,
     ) -> RatioBasedPosterior:
 
         optimizer_kwargs = {} if optimizer_kwargs is None else optimizer_kwargs
@@ -119,7 +120,7 @@ class RatioEstimator(NeuralInference, ABC):
         data = OrderedDict()
         data["theta"] = theta
         data["x"] = x
-        dataset = self.make_dataset(data)
+        dataset = self.make_dataset(data, numpy_noise=numpy_noise)
 
         train_loader, val_loader = self.make_dataloaders(dataset, validation_fraction, training_batch_size)
 

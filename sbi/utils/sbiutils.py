@@ -74,10 +74,11 @@ class Standardize(nn.Module):
         self.register_buffer("_std", std)
 
     def forward(self, x):
-            x_clone = x.clone()
-            idx_nonzero = x_clone.nonzero(as_tuple=True)
-            x_clone[idx_nonzero] = (x_clone[idx_nonzero] - self._mean) / self._std
-            return x_clone
+        # return (x - self._mean) / self._std
+        x_clone = x.clone()   
+        idx_nonzero = x_clone.nonzero(as_tuple=True)
+        x_clone[idx_nonzero] = (x_clone[idx_nonzero] - self._mean) / self._std
+        return x_clone
 
 
 def standardizing_net(batch_t: Tensor, min_std: float = 1e-7) -> nn.Module:
