@@ -66,6 +66,9 @@ class EstimatorNet(pl.LightningModule):
         loss = torch.mean(self.loss(theta, x, self.proposal))
         self.log('val_loss', loss, on_epoch=True)
 
+def worker_init_fn(worker_id):                                                          
+    np.random.seed(np.random.get_state()[1][0] + worker_id)
+
 class NeuralInference(ABC):
     """Abstract base class for neural inference methods."""
 
@@ -153,6 +156,7 @@ class NeuralInference(ABC):
                 batch_size=batch_size,
                 pin_memory=pin_memory,
                 num_workers=num_workers,
+                worker_init_fn=worker_init_fn,
             ) 
             val_loader = DataLoader(
                 dataset,
@@ -160,6 +164,7 @@ class NeuralInference(ABC):
                 batch_size=batch_size,
                 pin_memory=pin_memory,
                 num_workers=num_workers,
+                worker_init_fn=worker_init_fn,
             )  
 
         return train_loader, val_loader
