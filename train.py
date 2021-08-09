@@ -119,7 +119,7 @@ def parse_args():
     parser.add_argument("--laplacian_type", type=str, default='combinatorial', help='"normalized" or "combinatorial" Laplacian')
     parser.add_argument("--conv_source", type=str, default='deepsphere', help='Use "deepsphere" or "geometric" implementation of ChebConv layer')
     parser.add_argument("--conv_type", type=str, default='chebconv', help='Use "chebconv" or "gcn" graph convolution layers')
-    parser.add_argument("--n_neighbours", type=int, default=8, help="Number of neightbours in graph.")
+    parser.add_argument("--n_neighbours", type=int, default=8, help="Number of neighbours in graph.")
     parser.add_argument("--activation", type=str, default='relu', help='Nonlinearity, "relu" or "selu"')
     parser.add_argument("--max_num_epochs", type=int, default=50, help="Max number of training epochs")
     parser.add_argument("--kernel_size", type=int, default=4, help="GNN  kernel size")
