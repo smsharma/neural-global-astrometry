@@ -26,10 +26,14 @@ import mlflow
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, numpy_noise=False):
 =======
 def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, fc_dims=[[-1, 128], [128, 128], [128, 64]], truncate_conv=None):
 >>>>>>> 0d383a97b6e013488246a226286ceab1fe9e77f2
+=======
+def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, laplacian_type="combinatorial", n_neighbours=8, batch_size=256, max_num_epochs=50, stop_after_epochs=10, clip_max_norm=1., validation_fraction=0.15, initial_lr=1e-3, device=None, optimizer_kwargs={'weight_decay': 1e-5}, activation="relu", conv_source="deepsphere", conv_type="chebconv", num_samples=None, sigma_noise=0.0022, fc_dims=[[-1, 128], [128, 128], [128, 64]], truncate_conv=None):
+>>>>>>> e37bc6393a62da87c53a03230da6101e03c0f546
 
     # Cache hyperparameters to log
     params_to_log = locals()
@@ -124,7 +128,7 @@ def parse_args():
     parser.add_argument("--laplacian_type", type=str, default='combinatorial', help='"normalized" or "combinatorial" Laplacian')
     parser.add_argument("--conv_source", type=str, default='deepsphere', help='Use "deepsphere" or "geometric" implementation of ChebConv layer')
     parser.add_argument("--conv_type", type=str, default='chebconv', help='Use "chebconv" or "gcn" graph convolution layers')
-    parser.add_argument("--n_neighbours", type=int, default=8, help="Number of neightbours in graph.")
+    parser.add_argument("--n_neighbours", type=int, default=8, help="Number of neighbours in graph.")
     parser.add_argument("--activation", type=str, default='relu', help='Nonlinearity, "relu" or "selu"')
     parser.add_argument("--max_num_epochs", type=int, default=50, help="Max number of training epochs")
     parser.add_argument("--kernel_size", type=int, default=4, help="GNN  kernel size")
@@ -150,15 +154,11 @@ if __name__ == "__main__":
     if args.num_samples == -1:
         args.num_samples = None
 
-<<<<<<< HEAD
-    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours, num_samples=args.num_samples, sigma_noise=args.sigma_noise, numpy_noise=args.numpy_noise)
-=======
     if args.fc_dims == "None":
         args.fc_dims = None
     else:
         args.fc_dims = list(json.loads(args.fc_dims))
 
-    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours, num_samples=args.num_samples, sigma_noise=args.sigma_noise, fc_dims=args.fc_dims)
->>>>>>> 0d383a97b6e013488246a226286ceab1fe9e77f2
+    train(data_dir="{}/data/".format(args.dir), sample_name=args.sample, experiment_name=args.name, batch_size=args.batch_size, activation=args.activation, kernel_size=args.kernel_size, max_num_epochs=args.max_num_epochs, laplacian_type=args.laplacian_type, conv_source=args.conv_source, conv_type=args.conv_type, n_neighbours=args.n_neighbours, num_samples=args.num_samples, sigma_noise=args.sigma_noise, fc_dims=args.fc_dims, numpy_noise=args.numpy_noise)
 
     logging.info("All done! Have a nice day!")
