@@ -2,6 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 import healpy as hp
+import numpy as np
 
 from models.healpix_pool_unpool import Healpix
 from models.laplacians import get_healpix_laplacians
@@ -95,7 +96,9 @@ class SphericalGraphCNN(nn.Module):
         x_map = x[:, :self.npix_init, :]
 
         # Convolutional layers
-        for layer in self.cnn_layers:
+        for i_layer, layer in enumerate(self.cnn_layers):
+            # Uncomment to save intermediate feature maps
+            # np.save("/Users/smsharma/Desktop/x_map_" + str(i_layer) + ".npy", x_map.detach().numpy())
             x_map = layer(x_map)
 
         # Flatten or do average pooling before putting through full-connected layers
