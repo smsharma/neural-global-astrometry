@@ -2,7 +2,7 @@
 
 \PassOptionsToPackage{numbers,compress}{natbib}
 
-\usepackage[preprint]{neurips_2020_ml4ps}
+\usepackage[]{neurips_2021}
 \usepackage[utf8]{inputenc} 
 \usepackage[T1]{fontenc}    
 \usepackage{hyperref}       
@@ -30,6 +30,7 @@ pdfproducer=medialab,
 Siddharth Mishra-Sharma \\
 Massachusetts Institute of Technology \\
 The NSF AI Institute for Artificial Intelligence and Fundamental Interactions \\
+Harvard University \\ 
 New York University \\
 \texttt{sm8383@nyu.edu} \\
 }
@@ -39,7 +40,7 @@ New York University \\
 \maketitle
 
 \begin{abstract}
-Astrometric lensing has recently emerged as a promising way to characterize the population of dark matter clumps (subhalos) in our Galaxy. Leveraging recent advances in simulation-based inference and neural network architectures, we introduce a novel method to look for a global dark matter-induced lensing signature in astrometric datasets. Our method is able to achieve greater sensitivity, by over a factor of 2, to a cold dark matter population compared to existing approaches, establishing machine learning as a powerful tool for characterizing dark matter using astrometric data. 
+Astrometric lensing has recently emerged as a promising way to characterize the population of dark matter clumps (subhalos) in our Galaxy. Leveraging recent advances in simulation-based inference and neural network architectures, we introduce a novel method to look for a global dark matter-induced lensing signature in astrometric datasets. The method is able to achieve greater sensitivity, by over a factor of 2, to a cold dark matter population compared to existing approaches, establishing machine learning as a powerful tool for characterizing dark matter using astrometric data. 
 \end{abstract}
 
 \section{Introduction}
@@ -101,7 +102,7 @@ The classifier $s(x, \theta)$ in this case is a neural network that can work dir
 
 We bin the the velocity maps on a \texttt{HEALPix} grid with resolution parameter \texttt{nside=64}, the value in each pixel then quantifying the average velocity of quasars within that pixel. All inputs are normalized to zero mean and unit standard deviation across the training sample. Starting with 2 input channels representing the two orthogonal components of the velocity vector, we perform a graph convolution operation, increasing the channel dimension to 16, followed by a batch normalization, ReLU nonlinearity, and coarsening of the representation to resolution \texttt{nside=32} with max pooling (downsampling the representation by a factor of 4). Coarsening and pooling leverages scale separation, preserving characteristics of the signal across different resolutions. Four more such layers are employed, increasing the channel dimension by a factor of 2 at each step until a maximum of 128 and coarsening the pixel resolution by a factor of 4, with the final map having \texttt{nside=2} corresponding to 48 pixels. At this stage, we average over the spatial dimension in order to encourage feature rotational invariance, outputting 128 features onto which the parameter of interest $f_\mathrm{sub}$ is appended. This is passed through a fully-connected network with (1024, 128) hidden units outputting the classifier decision by applying a sigmoidal projection.
 
-$10^5$ samples from the forward model are produced, and the estimator is trained for up to 50 epochs with early stopping using the \texttt{AdamW} optimizer with initial learning rate $10^{-3}$ and weight decay $10^{-5}$, with cosine annealing used to decay the learning rate. Figure~\ref{fig:model} summarizes the architecture and method used in this work.
+$10^5$ samples from the forward model are produced. The estimator is trained for 50 epochs with a batch size of 64 using the \texttt{AdamW} optimizer with initial learning rate $10^{-3}$ and weight decay $10^{-5}$, with cosine annealing used to decay the learning rate. Figure~\ref{fig:model} summarizes the architecture and method used in this work.
 
 % LRT~\cite{Cranmer:2015bka}
 % AALR~\cite{Hermans:2019ioj}
@@ -125,16 +126,16 @@ $10^5$ samples from the forward model are produced, and the estimator is trained
 \section{Results on simulated data}
 \label{sec:experiments}
 
-The left panel of Fig.~\ref{fig:experiment} shows the expected test statistic (TS), defined as $\mathrm{TS} \equiv -2\ln(\hat r / \hat r_\mathrm{max})$, as a function of substructure fraction $f_\mathrm{sub}$ evaluated on test maps of the fiducial signal with $f_\mathrm{sub} \simeq 0.2$. Corresponding curves using the power spectrum approach are shown in blue, using minimum multipole thresholds of $\ell = 5$ (dashed) and $\ell = 10$ (solid). Thresholds corresponding to 1- and 2-$\sigma$ discovery are shown as the horizontal grey lines. We see that sensitivity gains of over a factor of $\sim 2$ can be expected when using the machine learning approach presented here when compared to the traditional power spectrum approach. No significant systematic bias on the central value of the inferred DM abundance is observed.
+The left panel of Fig.~\ref{fig:experiment} shows the expected test statistic (TS), defined as $\mathrm{TS} \equiv -2\ln(\hat r / \hat r_\mathrm{max})$, as a function of substructure fraction $f_\mathrm{sub}$ evaluated on test maps of the fiducial signal with $f_\mathrm{sub} \simeq 0.2$. Corresponding curves using the power spectrum approach are shown in blue, using minimum multipole thresholds of $\ell \geq 5$ (dashed) and $\ell \geq 10$ (solid). Thresholds corresponding to 1- and 2-$\sigma$ discovery are shown as the horizontal grey lines. We see that sensitivity gains of over a factor of $\sim 2$ can be expected when using the machine learning approach presented here when compared to the traditional power spectrum approach. No significant systematic bias on the central value of the inferred DM abundance is observed.
 
 The right panel of Fig.~\ref{fig:experiment} shows the scaling of expected sensitivity on substructure fraction $f_\mathrm{sub}$ with assumed noise per quasar, keeping the number of quasars fixed (red band, showing 1-$\sigma$ variation over test datasets) compared to the power spectrum approach (blue lines). A far more favorable scaling of the machine learning approach is seen compared to the power spectrum approach, suggesting that it may be disproportionately advantageous in the low signal-to-noise regimes that are generally most relevant for dark matter searches.
 
 \section{Conclusions and outlook}
 \label{sec:conclusions}
 
-By leveraging recent advances in simulation-based inference, we have introduced a method to analyze astrometric datasets over large regions of the sky with the aim of inferring the lensing signatures of a dark matter subhalo population. We have shown our method to be more sensitive, by over a factor of $\sim 2$, to a CDM subhalo population compared to methods based on global summary statistics, with more favorable scaling with instrumental noise. Since data collection and reduction is an expensive endeavor, the use of methods that can take advantage of more of the available information can be equated to potentially years of observations, underscoring their importance.
+By leveraging recent advances in simulation-based inference, we have introduced a method to analyze astrometric datasets over large regions of the sky with the aim of inferring the lensing signatures of a dark matter subhalo population. We have shown our method to be more sensitive, by over a factor of $\sim 2$, to a CDM subhalo population compared to established methods based on global summary statistics, with more favorable scaling with instrumental noise. Since data collection and reduction is an expensive endeavor, the use of methods that can take advantage of more of the available information can be equated to potentially years of observations, underscoring their importance. Additionally, unlike the power spectrum approach, the current method does not require the construction of a numerically-expensive estimator to account for non-uniform exposure and instrumental noise---these, as well as any other observational effects can be incorporated directly into the forward model.
 
-We have focused in this work on assessing sensitivity to a CDM-like subhalo population with quasar velocity astrometry, which is within the scope of upcoming radio telescopes like the SKA. Our method can also be applied in a straightforward manner to look for the \emph{acceleration} lensing signal, in particular sourced by a population of more compact subhalos than those expected in CDM. Both of these features are expected to introduce a larger degree of non-Gaussianity than in the signal explored here (as can be seen, \emph{e.g.}, in Fig. 1 of Ref.~\cite{Mishra-Sharma:2020ynk}). Such an analysis is within purview of the upcoming Roman exoplanet microlensing survey, and a machine learning approach could provide significant sensitivity gains over existing methods.
+We have focused in this work on assessing sensitivity to a CDM-like subhalo population with quasar velocity astrometry, which is within the scope of upcoming radio telescopes like the SKA. Our method can also be applied in a straightforward manner to look for the \emph{acceleration} lensing signal, in particular sourced by a population of more compact subhalos than those expected in CDM. Both of these features are expected to introduce a larger degree of non-Gaussianity than in the signal explored here (as can be seen, \emph{e.g.}, in Fig. 1 of Ref.~\cite{Mishra-Sharma:2020ynk}). Such an analysis is within purview of the upcoming Roman exoplanet microlensing survey as well as upcoming \emph{Gaia} data releases, and a machine learning approach could provide significant sensitivity gains over existing methods.
 
 Astrometric lensing has been established as a promising way to characterize the Galactic dark matter population, with theoretical progress in recent years going in step with advances on the observational side. While this work is a first attempt at bringing principled machine learning techniques to this field, with the availability of increasingly complex datasets we expect machine learning to be an important general-purpose tool for future astrometric studies.
 
@@ -167,6 +168,75 @@ software packages.
 \end{ack}
 
 \bibliographystyle{apsrev4-1-mod}
+
+{
+\small
 \bibliography{sbi-astrometry}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Checklist}
+
+\begin{enumerate}
+
+\item For all authors...
+\begin{enumerate}
+  \item Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \answerYes{}
+  \item Did you describe the limitations of your work?
+    \answerYes{See Sec.~\ref{sec:conclusions}}
+  \item Did you discuss any potential negative societal impacts of your work?
+    \answerYes{See Sec.~\ref{sec:impact}}
+  \item Have you read the ethics review guidelines and ensured that your paper conforms to them?
+    \answerYes{}
+\end{enumerate}
+
+\item If you are including theoretical results...
+\begin{enumerate}
+  \item Did you state the full set of assumptions of all theoretical results?
+    \answerNA{No theoretical results were used in this work.}
+	\item Did you include complete proofs of all theoretical results?
+    \answerNA{}
+\end{enumerate}
+
+\item If you ran experiments...
+\begin{enumerate}
+  \item Did you include the code, data, and instructions needed to reproduce the main experimental results (either in the supplemental material or as a URL)?
+    \answerYes{The code repository associated with this (\url{https://github.com/smsharma/sbi-astrometry}) paper is mentioned in Sec.~\ref{sec:conclusions}}
+  \item Did you specify all the training details (e.g., data splits, hyperparameters, how they were chosen)?
+    \answerYes{}
+	\item Did you report error bars (e.g., with respect to the random seed after running experiments multiple times)?
+    \answerNo{}
+	\item Did you include the total amount of compute and the type of resources used (e.g., type of GPUs, internal cluster, or cloud provider)?
+    \answerNo{}
+\end{enumerate}
+
+\item If you are using existing assets (e.g., code, data, models) or curating/releasing new assets...
+\begin{enumerate}
+  \item If your work uses existing assets, did you cite the creators?
+    \answerTODO{}
+  \item Did you mention the license of the assets?
+    \answerNA{}
+  \item Did you include any new assets either in the supplemental material or as a URL?
+    \answerNA{No new assets (excluding the code used to reproduced the experiments) were produced in this work}
+  \item Did you discuss whether and how consent was obtained from people whose data you're using/curating?
+    \answerNA{}
+  \item Did you discuss whether the data you are using/curating contains personally identifiable information or offensive content?
+    \answerNA{No personal information is included in the assets utilized in this paper.}
+\end{enumerate}
+
+\item If you used crowdsourcing or conducted research with human subjects...
+\begin{enumerate}
+  \item Did you include the full text of instructions given to participants and screenshots, if applicable?
+    \answerNA{}
+  \item Did you describe any potential participant risks, with links to Institutional Review Board (IRB) approvals, if applicable?
+    \answerNA{}
+  \item Did you include the estimated hourly wage paid to participants and the total amount spent on participant compensation?
+    \answerNA{}
+\end{enumerate}
+
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
