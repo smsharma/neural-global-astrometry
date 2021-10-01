@@ -33,7 +33,6 @@ def get_Cells(alm_theta, alm_phi, lmax):
     Cl_B = 2*np.sum(np.abs(fB_ary)**2, axis=1)
     Cl_C = 2*np.sum(np.abs(fC_ary)**2, axis=1)
 
-
     return Cl_B, Cl_C, fB_ary, fC_ary
 
 def get_vector_alm(map_theta, map_phi):

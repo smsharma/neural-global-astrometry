@@ -11,16 +11,16 @@ batch = """#!/bin/bash
 #SBATCH --gres=gpu:1
 ##SBATCH --mail-type=begin
 #SBATCH --mail-type=end
-#SBATCH --mail-user=siddharthmishra19@gmail.com
+#SBATCH --mail-user=smsharma@mit.com
 
 source ~/.bashrc
 conda activate sbi-fermi
 cd /scratch/sm8383/sbi-astrometry/
 """
 
-##########################
-# Explore configurations #
-##########################
+############################
+# Grid over configurations #
+############################
 
 batch_size_list = [64]
 activations = ["relu"]
@@ -29,7 +29,7 @@ n_neighbours_list = [8]
 laplacian_types = ["combinatorial"]
 conv_types = ["chebconv"]
 conv_source_list = ["deepsphere"]
-sigma_noise_list = [0]  # np.linspace(0.0002, 0.003, 5)
+sigma_noise_list = np.linspace(0.0002, 0.003, 5)
 
 for n_neighbours in n_neighbours_list:
     for batch_size in batch_size_list:

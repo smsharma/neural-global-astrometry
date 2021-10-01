@@ -2,74 +2,58 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys, os
 import argparse
 import logging
-from operator import itemgetter
+import warnings
 
-import numpy as np
-import healpy as hp
-from tqdm.auto import tqdm
-import torch
-
-from simulation.astrometry_sim import QuasarSim
-
-logger = logging.getLogger(__name__)
 sys.path.append("./")
 sys.path.append("../")
 
-from sbi import utils
-from utils import create_mask as cm
-from theory.units import *
-
-import warnings
+import numpy as np
+import healpy as hp
+import torch
+from tqdm.auto import tqdm
 from astropy.utils.exceptions import AstropyDeprecationWarning
 
+from simulation.astrometry_sim import QuasarSim
+from sbi import utils
+from theory.units import *
+
+logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore", category=AstropyDeprecationWarning)
+
 
 def simulate(n=1000, nside=64, max_sep=20):
     """ High-level simulation script
     """
-
-
 
     logger.info("Generating training data with %s maps", n)
 
     # Dict to save results
     results = {}
 
-    # Priors for DM template, if required
-    
-    # Generate simulation parameter points. Priors hard-coded for now.
-    prior = utils.BoxUniform(low=torch.tensor([0.001]), 
-                             high=torch.tensor([300.]))
-
+    # Generate points for parameter of interest, here calibrated number of subhalos between 10^8 and 10^10 M_s
+    prior = utils.BoxUniform(low=torch.tensor([0.001]), high=torch.tensor([300.0]))
     thetas = prior.sample((n,))
 
     logger.info("Generating maps...")
 
-    max_sep = 25
+    max_sep = 25  # Maximum distance from subhalo center at which to express lensing effects
 
-    sim = QuasarSim(max_sep=max_sep, 
-                    verbose=True,
-                    sim_uniform=True, 
-                    nside=nside, 
-                    calc_powerspecs=False, 
-                    do_alpha=False,
-                    sh_profile='NFW')
+    # Instantiate simulator
+    sim = QuasarSim(max_sep=max_sep, verbose=True, sim_uniform=True, nside=nside, calc_powerspecs=False, do_alpha=False, sh_profile="NFW")
 
     x = np.zeros((n, 2, hp.nside2npix(nside)))
 
+    # Simulate sample for each parameter point
     for i, theta in tqdm(enumerate(thetas), total=n):
 
         sim.set_mass_distribution(sim.rho_M_SI, M_min=1e7 * M_s, M_max=1e10 * M_s, M_min_calib=1e8 * M_s, M_max_calib=1.1e10 * M_s, N_calib=theta[0].detach().numpy(), alpha=-1.9)
         sim.set_radial_distribution(sim.r2rho_V_ein_EAQ, R_min=1e-3 * kpc, R_max=260 * kpc)
         sim.set_subhalo_properties(sim.c200_SCP, distdep=False)
-
         sim.analysis_pipeline(get_sample=True)
 
-        sim.mu_qsrs = hp.reorder(np.transpose(sim.mu_qsrs), r2n=True)
+        sim.mu_qsrs = hp.reorder(np.transpose(sim.mu_qsrs), r2n=True)  # Convert to NESTED ordering
 
         x[i, :, :] = 1e6 * sim.mu_qsrs
-
-    logger.info("Converting from RING to NEST ordering...")
 
     results["x"] = x
     results["theta"] = thetas
@@ -93,6 +77,7 @@ def save(data_dir, name, data):
     for key, value in data.items():
         np.save("{}/data/samples/{}_{}.npy".format(data_dir, key, name), value)
 
+
 def parse_args():
     """ Parse command line arguments
     """
@@ -100,7 +85,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Main high-level script that starts the GCE simulations")
 
     parser.add_argument(
-        "-n", type=int, default=10000, help="Number of samples to generate. Default is 10k.",
+        "-n", type=int, default=10000, help="Number of samples to generate",
     )
     parser.add_argument("--name", type=str, default=None, help='Sample name, like "train" or "test".')
     parser.add_argument("--dir", type=str, default=".", help="Base directory. Results will be saved in the data/samples subfolder.")
