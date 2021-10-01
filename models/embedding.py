@@ -15,7 +15,7 @@ class SphericalGraphCNN(nn.Module):
     """Spherical GCNN Autoencoder.
     """
 
-    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 128], [128, 128], [128, 64]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1, pooling_end="average"):
+    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 128], [128, 128], [128, 64]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1, pooling_end="average", save_reps=False):
         """Initialization.
 
         Args:
@@ -30,6 +30,8 @@ class SphericalGraphCNN(nn.Module):
         self.in_ch = in_ch
         self.pooling_end = pooling_end
 
+        self.save_reps = save_reps
+
         # Specify convolutional part
 
         self.laps, self.adjs = get_healpix_laplacians(nside_list=nside_list, laplacian_type=laplacian_type, indexes_list=indexes_list, n_neighbours=n_neighbours, nest=nest)
@@ -42,7 +44,7 @@ class SphericalGraphCNN(nn.Module):
             self.activation_function = nn.SELU()
         else:
             raise NotImplementedError
-        
+
         conv_config = [(self.in_ch, 16), (16, 32), (32, 64), (64, 128)] + [(128, 128)] * (len(nside_list) - 4)
 
         self.npix_init = hp.nside2npix(nside_list[0])
@@ -93,12 +95,14 @@ class SphericalGraphCNN(nn.Module):
 
         # Initialize tensor
         x = x.view(-1, self.npix_init, self.in_ch)
-        x_map = x[:, :self.npix_init, :]
+        x_map = x[:, : self.npix_init, :]
 
         # Convolutional layers
         for i_layer, layer in enumerate(self.cnn_layers):
             # Uncomment to save intermediate feature maps
-            np.save("/Users/smsharma/Desktop/x_map_" + str(i_layer) + ".npy", x_map.detach().numpy())
+
+            if self.save_reps:
+                np.save("../data/x_map_" + str(i_layer) + ".npy", x_map.detach().numpy())
             x_map = layer(x_map)
 
         # Flatten or do average pooling before putting through full-connected layers
@@ -108,7 +112,7 @@ class SphericalGraphCNN(nn.Module):
             x_map = x_map.mean([1])
 
         # Concatenate auxiliary variable along last dimension
-        if (self.n_params != 0):
+        if self.n_params != 0:
             x_map = torch.cat([x_map, theta], -1)
 
         x_map = x_map.unsqueeze(1)
