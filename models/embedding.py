@@ -100,9 +100,11 @@ class SphericalGraphCNN(nn.Module):
         # Convolutional layers
         for i_layer, layer in enumerate(self.cnn_layers):
             # Uncomment to save intermediate feature maps
-
-            if self.save_reps:
-                np.save("../data/x_map_" + str(i_layer) + ".npy", x_map.detach().numpy())
+            try:
+                if self.save_reps:
+                    np.save("../data/x_map_" + str(i_layer) + ".npy", x_map.detach().numpy())
+            except:
+                pass
             x_map = layer(x_map)
 
         # Flatten or do average pooling before putting through full-connected layers
