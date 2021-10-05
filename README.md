@@ -1,4 +1,4 @@
-# Inferring dark matter substructure with astrometric lensing beyond the power spectrum
+# Inferring dark matter substructure with astrometric lensing
 
 [Siddharth Mishra-Sharma](smsharma@mit.edu)
 
