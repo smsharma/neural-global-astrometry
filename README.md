@@ -22,9 +22,9 @@ python setup.py install
 
 - [simulate.py](simulate.py) produces full-sky astrometric maps for training. In the [scripts](scripts/) folder, `sbatch --array=0-999 simulate.sh` parallelizes sample generation in a SLURM HPC environment.
 - [combine_samples.py](combine_samples.py) combines the generated samples into single files in order to use them for training. [scripts/combine_samples.sh](scripts/combine_samples.sh) submits this as a SLURM job.
-- [train.py](trian.py) trains the likelihood-ratio estimator. Experiments are managed using `MLflow'. [scripts/submit_train.py](scripts/submit_train.py) submits SLURM scripts over a possible grid of configurations; see options in [train.py](trian.py).
+- [train.py](train.py) trains the likelihood-ratio estimator. Experiments are managed using `MLflow'. [scripts/submit_train.py](scripts/submit_train.py) submits SLURM scripts over a possible grid of configurations; see options in [train.py](trian.py).
 
-The notebook [notebooks](01_analysis.ipynb) analyzes the results and produces the plots in the paper. There, trained neural networks are loaded using their saved `MLflow` IDs.
+This [notebooks](notebooks/01_analysis.ipynb) analyzes the results and produces the plots in the paper. There, trained neural networks are loaded using their saved `MLflow` IDs.
 
 ## Citation
 
@@ -40,4 +40,4 @@ The notebook [notebooks](01_analysis.ipynb) analyzes the results and produces th
 }
 ```
 
-The analysis makes heavy use of (sbi)[https://github.com/mackelab/sbi] for inference, (code)[https://github.com/smsharma/astrometry-lensing-correlations] associated with [2003.02264](https://arxiv.org/abs/2003.02264) for forward modeling, and (code)[https://github.com/smsharma/mining-for-substructure-lens] associated with [1909.02005](https://arxiv.org/abs/1909.02005) for data processing.
+The analysis makes heavy use of [sbi](https://github.com/mackelab/sbi) for inference, [code](https://github.com/smsharma/astrometry-lensing-correlations) associated with [2003.02264](https://arxiv.org/abs/2003.02264) for forward modeling, and [code](https://github.com/smsharma/mining-for-substructure-lens) associated with [1909.02005](https://arxiv.org/abs/1909.02005) for data processing.
