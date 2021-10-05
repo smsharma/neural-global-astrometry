@@ -29,7 +29,7 @@ This [notebooks](notebooks/01_analysis.ipynb) analyzes the results and produces 
 ## Citation
 
 ```
-@article{Brehmer:2019jyt,
+@article{Mishra-Sharma:2021xyz,
       author         = "Mishra-Sharma, Siddharth",
       title          = "{Inferring dark matter substructure with astrometric lensing beyond the power spectrum}",
       year           = "2021",
