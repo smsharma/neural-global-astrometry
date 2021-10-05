@@ -87,8 +87,8 @@ def parse_args():
     parser.add_argument(
         "-n", type=int, default=10000, help="Number of samples to generate",
     )
-    parser.add_argument("--name", type=str, default=None, help='Sample name, like "train" or "test".')
-    parser.add_argument("--dir", type=str, default=".", help="Base directory. Results will be saved in the data/samples subfolder.")
+    parser.add_argument("--name", type=str, default=None, help="Sample name")
+    parser.add_argument("--dir", type=str, default=".", help="Base directory")
     parser.add_argument("--debug", action="store_true", help="Prints debug output.")
 
     return parser.parse_args()

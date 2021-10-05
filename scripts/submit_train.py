@@ -40,7 +40,7 @@ for n_neighbours in n_neighbours_list:
                         for conv_source in conv_source_list:
                             for sigma_noise in sigma_noise_list:
                                 batchn = batch + "\n"
-                                batchn += "python -u train.py --sample train --name numpy_noise --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {} --sigma_noise {} --fc_dims '[[-1, 1024],[1024, 256]]' --numpy_noise 1".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source, sigma_noise)
+                                batchn += "python -u train.py --sample train --name numpy_noise --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {} --sigma_noise {} --fc_dims '[[-1, 1024],[1024, 128]]' --numpy_noise 1".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source, sigma_noise)
                                 fname = "batch/submit.batch"
                                 f = open(fname, "w")
                                 f.write(batchn)
