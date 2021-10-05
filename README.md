@@ -40,4 +40,8 @@ This [notebooks](notebooks/01_analysis.ipynb) analyzes the results and produces 
 }
 ```
 
-The analysis makes heavy use of [sbi](https://github.com/mackelab/sbi) for inference, [code](https://github.com/smsharma/astrometry-lensing-correlations) associated with [2003.02264](https://arxiv.org/abs/2003.02264) for forward modeling, and [code](https://github.com/smsharma/mining-for-substructure-lens) associated with [1909.02005](https://arxiv.org/abs/1909.02005) for data processing.
+The repository contains 
+- Code that is part of [sbi](https://github.com/mackelab/sbi) for inference,
+- [Code](https://github.com/smsharma/astrometry-lensing-correlations) associated with [2003.02264](https://arxiv.org/abs/2003.02264) for forward modeling, 
+- [Code](https://github.com/smsharma/mining-for-substructure-lens) associated with [1909.02005](https://arxiv.org/abs/1909.02005) for scripting and data processing, and
+- [Code](https://github.com/deepsphere/deepsphere-pytorch) associated with [2012.15000](https://arxiv.org/abs/2012.15000) for constructing the feature extractor network.
