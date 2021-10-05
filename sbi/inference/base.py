@@ -1,30 +1,22 @@
 # This file is part of sbi, a toolkit for simulation-based inference. sbi is licensed
 # under the Affero General Public License v3, see <https://www.gnu.org/licenses/>.
 
-from abc import ABC, abstractmethod
-from copy import deepcopy
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
-from warnings import warn
-
-import torch
-from torch import Tensor
-from torch.utils.tensorboard import SummaryWriter
-
-from sbi.inference.posteriors.base_posterior import NeuralPosterior
-from sbi.utils import get_log_root
-from sbi.utils.torchutils import process_device, seed_worker
-
-from torch.utils.data import Dataset, DataLoader, ConcatDataset
-from torch.utils.data.sampler import SubsetRandomSampler
-from torch.utils.tensorboard import SummaryWriter
+from abc import ABC
+from typing import Optional, Union
 
 import numpy as np
 import six
-import os
+
+import torch
+from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import Dataset, DataLoader
+from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.tensorboard import SummaryWriter
 
 import pytorch_lightning as pl
+
+from sbi.utils import get_log_root
+from sbi.utils.torchutils import process_device
 
 
 class EstimatorNet(pl.LightningModule):
@@ -37,7 +29,7 @@ class EstimatorNet(pl.LightningModule):
 
         super().__init__()
 
-        self.save_hyperparameters('initial_lr')
+        self.save_hyperparameters("initial_lr")
 
         self.net = net
         self.proposal = proposal
@@ -53,21 +45,23 @@ class EstimatorNet(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = self.optimizer(list(self.net.parameters()), lr=self.initial_lr, **self.optimizer_kwargs)
         scheduler = self.scheduler(optimizer, **self.scheduler_kwargs)
-        return {'optimizer': optimizer, 'lr_scheduler': scheduler, 'monitor': 'val_loss'}
+        return {"optimizer": optimizer, "lr_scheduler": scheduler, "monitor": "val_loss"}
 
     def training_step(self, batch, batch_idx):
         theta, x = batch
         loss = torch.mean(self.loss(theta, x, self.proposal))
-        self.log('train_loss', loss, on_epoch=True)
+        self.log("train_loss", loss, on_epoch=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         theta, x = batch
         loss = torch.mean(self.loss(theta, x, self.proposal))
-        self.log('val_loss', loss, on_epoch=True)
+        self.log("val_loss", loss, on_epoch=True)
 
-def worker_init_fn(worker_id):                                                          
+
+def worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
+
 
 class NeuralInference(ABC):
     """Abstract base class for neural inference methods."""
@@ -112,7 +106,7 @@ class NeuralInference(ABC):
         # Initialize list that indicates the round from which simulations were drawn.
         self._data_round_index = []
         self._round = 0
-        self.summary_writer =  summary_writer
+        self.summary_writer = summary_writer
 
     @staticmethod
     def make_dataset(data, numpy_noise=False):
@@ -128,13 +122,7 @@ class NeuralInference(ABC):
     @staticmethod
     def make_dataloaders(dataset, validation_split, batch_size, num_workers=32, pin_memory=True, seed=None):
         if validation_split is None or validation_split <= 0.0:
-            train_loader = DataLoader(
-                dataset,
-                batch_size=batch_size,
-                shuffle=True,
-                pin_memory=pin_memory,
-                num_workers=num_workers,
-            ) 
+            train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=pin_memory, num_workers=num_workers,)
             val_loader = None
         else:
             assert 0.0 < validation_split < 1.0, "Wrong validation split: {}".format(validation_split)
@@ -150,22 +138,8 @@ class NeuralInference(ABC):
             train_sampler = SubsetRandomSampler(train_idx)
             val_sampler = SubsetRandomSampler(valid_idx)
 
-            train_loader = DataLoader(
-                dataset,
-                sampler=train_sampler,
-                batch_size=batch_size,
-                pin_memory=pin_memory,
-                num_workers=num_workers,
-                worker_init_fn=worker_init_fn,
-            ) 
-            val_loader = DataLoader(
-                dataset,
-                sampler=val_sampler,
-                batch_size=batch_size,
-                pin_memory=pin_memory,
-                num_workers=num_workers,
-                worker_init_fn=worker_init_fn,
-            )  
+            train_loader = DataLoader(dataset, sampler=train_sampler, batch_size=batch_size, pin_memory=pin_memory, num_workers=num_workers, worker_init_fn=worker_init_fn,)
+            val_loader = DataLoader(dataset, sampler=val_sampler, batch_size=batch_size, pin_memory=pin_memory, num_workers=num_workers, worker_init_fn=worker_init_fn,)
 
         return train_loader, val_loader
 
@@ -210,7 +184,7 @@ class NumpyDataset(Dataset):
             if memmap:
                 tensor = np.array(array[index])
                 if self.numpy_noise:
-                    items.append(torch.from_numpy(tensor  + np.random.normal(loc=0, scale=0.0023 / 1., size=tensor.shape)).to(self.dtype))
+                    items.append(torch.from_numpy(tensor + np.random.normal(loc=0, scale=0.0023 / 1.0, size=tensor.shape)).to(self.dtype))
                 else:
                     items.append(torch.from_numpy(tensor).to(self.dtype))
             else:
