@@ -3,7 +3,7 @@
 [Siddharth Mishra-Sharma](smsharma@mit.edu)
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![arXiv](https://img.shields.io/badge/arXiv-2110.xxxxx%20-green.svg)](https://arxiv.org/abs/2110.xxxxx)
+[![arXiv](https://img.shields.io/badge/arXiv-2110.01620%20-green.svg)](https://arxiv.org/abs/2110.01620)
 
 ![Summary of model.](paper/arXiv-v1/figures/hig.png)
 
@@ -33,10 +33,10 @@ This [notebooks](notebooks/01_analysis.ipynb) analyzes the results and produces 
       author         = "Mishra-Sharma, Siddharth",
       title          = "{Inferring dark matter substructure with astrometric lensing beyond the power spectrum}",
       year           = "2021",
-      eprint         = "2110.xxxxx",
+      eprint         = "2110.01620",
       archivePrefix  = "arXiv",
       primaryClass   = "astro-ph.CO",
-      SLACcitation   = "%%CITATION = ARXIV:2110.xxxxx;%%"
+      SLACcitation   = "%%CITATION = ARXIV:2110.01620;%%"
 }
 ```
 
