@@ -22,7 +22,7 @@ python setup.py install
 
 - [simulate.py](simulate.py) produces full-sky astrometric maps for training. In the [scripts](scripts/) folder, `sbatch --array=0-999 simulate.sh` parallelizes sample generation in a SLURM HPC environment.
 - [combine_samples.py](combine_samples.py) combines the generated samples into single files in order to use them for training. [scripts/combine_samples.sh](scripts/combine_samples.sh) submits this as a SLURM job.
-- [train.py](train.py) trains the likelihood-ratio estimator. Experiments are managed using `MLflow'. [scripts/submit_train.py](scripts/submit_train.py) submits SLURM scripts over a possible grid of configurations; see options in [train.py](trian.py).
+- [train.py](train.py) trains the likelihood-ratio estimator. Experiments are managed using `MLflow'. [scripts/submit_train.py](scripts/submit_train.py) can loop over a grid of analysis configurations and submit a SLURM script for each; see options in [train.py](train.py).
 
 This [notebooks](notebooks/01_analysis.ipynb) analyzes the results and produces the plots in the paper. There, trained neural networks are loaded using their saved `MLflow` IDs.
 
