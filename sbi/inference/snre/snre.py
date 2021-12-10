@@ -31,7 +31,6 @@ from sbi.utils import del_entries
 from sbi import utils as utils
 from sbi.inference import NeuralInference, EstimatorNet
 from sbi.inference.posteriors.ratio_based_posterior import RatioBasedPosterior
-from sbi.inference.posteriors.direct_posterior import DirectPosterior
 from sbi.types import TorchModule
 from sbi.utils import x_shape_from_simulation
 
@@ -42,16 +41,7 @@ import mlflow.pytorch
 
 
 class RatioEstimator(NeuralInference, ABC):
-    def __init__(
-        self,
-        prior,
-        classifier: Union[str, Callable] = "resnet",
-        device: str = "cpu",
-        logging_level: Union[int, str] = "warning",
-        summary_writer: Optional[SummaryWriter] = None,
-        show_progress_bars: bool = True,
-        **unused_args
-    ):
+    def __init__(self, prior, classifier: Union[str, Callable] = "resnet", device: str = "cpu", logging_level: Union[int, str] = "warning", summary_writer: Optional[SummaryWriter] = None, show_progress_bars: bool = True, **unused_args):
         r"""Sequential Neural Ratio Estimation.
 
         We implement two inference methods in the respective subclasses.
@@ -77,14 +67,7 @@ class RatioEstimator(NeuralInference, ABC):
         See docstring of `NeuralInference` class for all other arguments.
         """
 
-        super().__init__(
-            prior=prior,
-            device=device,
-            logging_level=logging_level,
-            summary_writer=summary_writer,
-            show_progress_bars=show_progress_bars,
-            **unused_args
-        )
+        super().__init__(prior=prior, device=device, logging_level=logging_level, summary_writer=summary_writer, show_progress_bars=show_progress_bars, **unused_args)
 
         self._build_neural_net = classifier
 
@@ -108,8 +91,7 @@ class RatioEstimator(NeuralInference, ABC):
     ) -> RatioBasedPosterior:
 
         optimizer_kwargs = {} if optimizer_kwargs is None else optimizer_kwargs
-        scheduler_kwargs = {'T_max':max_num_epochs} if scheduler_kwargs is None else scheduler_kwargs
-
+        scheduler_kwargs = {"T_max": max_num_epochs} if scheduler_kwargs is None else scheduler_kwargs
 
         max_num_epochs = 2 ** 31 - 1 if max_num_epochs is None else max_num_epochs
 
@@ -135,7 +117,7 @@ class RatioEstimator(NeuralInference, ABC):
         self.neural_net = self._build_neural_net(theta_z_score, x_z_score)
         self.x_shape = x_shape_from_simulation(x_z_score)
 
-        max_num_epochs=cast(int, max_num_epochs)
+        max_num_epochs = cast(int, max_num_epochs)
 
         logging.info("Building estimator")
 
@@ -143,10 +125,10 @@ class RatioEstimator(NeuralInference, ABC):
             net=self.neural_net,
             proposal=proposal,
             loss=self.loss,
-            initial_lr=initial_lr, 
-            optimizer=optimizer, 
-            optimizer_kwargs=optimizer_kwargs, 
-            scheduler=scheduler, 
+            initial_lr=initial_lr,
+            optimizer=optimizer,
+            optimizer_kwargs=optimizer_kwargs,
+            scheduler=scheduler,
             scheduler_kwargs=scheduler_kwargs,
         )
 
@@ -154,11 +136,11 @@ class RatioEstimator(NeuralInference, ABC):
         path = Path(checkpoint_path)
         path.mkdir(parents=True, exist_ok=True)
 
-        model_checkpoint = ModelCheckpoint(monitor='val_loss', dirpath=checkpoint_path, filename="{epoch:02d}-{val_loss:.2f}", period=5, save_top_k=3)
+        model_checkpoint = ModelCheckpoint(monitor="val_loss", dirpath=checkpoint_path, filename="{epoch:02d}-{val_loss:.2f}", period=5, save_top_k=3)
         checkpoint_callback = model_checkpoint
 
-        early_stop_callback = EarlyStopping(monitor='val_loss', patience=stop_after_epochs)        
-        lr_monitor = LearningRateMonitor(logging_interval='epoch')
+        early_stop_callback = EarlyStopping(monitor="val_loss", patience=stop_after_epochs)
+        lr_monitor = LearningRateMonitor(logging_interval="epoch")
 
         logging.info("Training")
 
@@ -187,10 +169,10 @@ class RatioEstimator(NeuralInference, ABC):
             net=self.neural_net,
             proposal=proposal,
             loss=self.loss,
-            initial_lr=initial_lr, 
-            optimizer=optimizer, 
-            optimizer_kwargs=optimizer_kwargs, 
-            scheduler=scheduler, 
+            initial_lr=initial_lr,
+            optimizer=optimizer,
+            optimizer_kwargs=optimizer_kwargs,
+            scheduler=scheduler,
             scheduler_kwargs=scheduler_kwargs,
         )
 
@@ -269,7 +251,7 @@ class RatioEstimator(NeuralInference, ABC):
         """
         batch_size = theta.shape[0]
         repeated_x = utils.repeat_rows(x, num_atoms)
-        
+
         # Choose `1` or `num_atoms - 1` thetas from the rest of the batch for each x.
         probs = ones(batch_size, batch_size) * (1 - eye(batch_size)) / (batch_size - 1)
 
@@ -277,13 +259,16 @@ class RatioEstimator(NeuralInference, ABC):
 
         contrasting_theta = theta[choices]
 
-        atomic_theta = torch.cat((theta[:, None, :], contrasting_theta), dim=1).reshape(
-            batch_size * num_atoms, -1
-        )
+        atomic_theta = torch.cat((theta[:, None, :], contrasting_theta), dim=1).reshape(batch_size * num_atoms, -1)
 
         return self.neural_net(repeated_x, atomic_theta)
 
-    def loss(self, theta: Tensor, x: Tensor, proposal: Optional[Any],) -> Tensor:
+    def loss(
+        self,
+        theta: Tensor,
+        x: Tensor,
+        proposal: Optional[Any],
+    ) -> Tensor:
         """
         Returns the binary cross-entropy loss for the trained classifier.
 
@@ -306,7 +291,6 @@ class RatioEstimator(NeuralInference, ABC):
         # from the marginals p(theta)p(x) and is labelled 0. And so on.
         labels = torch.ones(2 * batch_size).type_as(likelihood)  # two atoms
         labels[1::2] = 0.0
-        
+
         # Binary cross entropy to learn the likelihood (AALR-specific)
         return nn.BCELoss()(likelihood, labels)
-        
