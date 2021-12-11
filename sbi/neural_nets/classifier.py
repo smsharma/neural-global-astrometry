@@ -17,20 +17,23 @@ class GaussianNoise(nn.Module):
             the same regardless of the scale of the vector.
     """
 
-    def __init__(self, sigma=0.0):
+    def __init__(self, sigma=None):
         super().__init__()
         self.sigma = sigma
         self.register_buffer("noise", torch.tensor(0))
 
     def forward(self, x):
-        if self.sigma != 0.0:
+        if self.sigma is not None:
+            if torch.is_tensor(self.sigma):
+                x = x.to(self.sigma.device)
+                self.noise = self.noise.to(self.sigma.device)
             sampled_noise = self.noise.expand(*x.size()).detach().float().normal_() * self.sigma
             x = x + sampled_noise
         return x
 
 
 class StandardizeInputs(nn.Module):
-    def __init__(self, embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x, z_score_y, sigma_noise=0.0):
+    def __init__(self, embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x, z_score_y, sigma_noise=None):
         super().__init__()
         self.embedding_net_x = embedding_net_x
         self.embedding_net_y = embedding_net_y
@@ -96,7 +99,10 @@ def build_mlp_mixed_classifier(batch_x: Tensor = None, batch_y: Tensor = None, z
     # Infer the output dimensionalities of the embedding_net by making a forward pass.
     x_numel = embedding_net_y(batch_y[:1], batch_x[:1]).numel()
 
-    neural_net = nn.Sequential(nn.ReLU(), nn.Linear(x_numel, 1),)
+    neural_net = nn.Sequential(
+        nn.ReLU(),
+        nn.Linear(x_numel, 1),
+    )
 
     input_layer = StandardizeInputs(embedding_net_x, embedding_net_y, batch_x, batch_y, z_score_x=z_score_x, z_score_y=z_score_y, sigma_noise=sigma_noise)
 

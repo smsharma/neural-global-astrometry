@@ -182,8 +182,6 @@ class RatioEstimator(NeuralInference, ABC):
     def build_posterior(
         self,
         density_estimator: Optional[TorchModule] = None,
-        mcmc_method: str = "slice_np",
-        mcmc_parameters: Optional[Dict[str, Any]] = None,
     ) -> RatioBasedPosterior:
         r"""
         Build posterior from the neural density estimator.
@@ -231,8 +229,6 @@ class RatioEstimator(NeuralInference, ABC):
             neural_net=density_estimator,
             prior=self._prior,
             x_shape=self._x_shape,
-            mcmc_method=mcmc_method,
-            mcmc_parameters=mcmc_parameters,
             device=device,
         )
 
