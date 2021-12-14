@@ -99,8 +99,11 @@ class SphericalGraphCNN(nn.Module):
         x_map = x[:, : self.npix_init, :]
 
         # Apply mask
-        if self.mask is not None:
-            x_map[:, self.mask, :] = 0.0
+        try:
+            if self.mask is not None:
+                x_map[:, self.mask, :] = 0.0
+        except:
+            pass
 
         # Convolutional layers
         for i_layer, layer in enumerate(self.cnn_layers):

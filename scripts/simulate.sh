@@ -10,6 +10,10 @@
 
 source ~/.bashrc
 conda activate sbi-fermi
-cd /scratch/sm8383/sbi-astrometry/
+cd /scratch/sm8383/neural-global-astrometry/
 
-python -u simulate.py -n 100 --name train_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/
+# python -u simulate.py -n 100 --name train_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/
+# python -u simulate.py -n 100 --name test_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/
+# python -u simulate.py -n 10 --name test_150_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/ --f_sub 150
+python -u simulate.py -n 10 --name test_200_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/ --f_sub 200
+python -u simulate.py -n 10 --name test_100_${SLURM_ARRAY_TASK_ID} --dir /scratch/sm8383/sbi-astrometry/ --f_sub 100

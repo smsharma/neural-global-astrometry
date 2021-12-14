@@ -72,9 +72,7 @@ def train(data_dir, experiment_name, sample_name, nside_max=64, kernel_size=4, l
 
         mask_roi = sigma_noise_model[0] == 0
 
-        mask_roi = torch.Tensor(hp.reorder(mask_roi, r2n=True)).bool()
-
-        print()
+        mask_roi = torch.Tensor(mask_roi).bool()
         sigma_noise = torch.Tensor(sigma_noise_model).unsqueeze((0)).to(device)
     else:
         mask_roi = None
