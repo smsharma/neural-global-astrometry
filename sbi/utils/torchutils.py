@@ -14,9 +14,11 @@ from torch.distributions import Independent, Uniform
 from sbi import utils as utils
 from sbi.types import Array, OneOrMore, ScalarFloat
 
+
 def seed_worker(worker_id):
-    worker_seed = torch.initial_seed() % 2**32
+    worker_seed = torch.initial_seed() % 2 ** 32
     np.random.seed(worker_seed)
+
 
 def process_device(device: str) -> str:
     """Set and return the default device to cpu or gpu."""
@@ -204,10 +206,7 @@ def gaussian_kde_log_eval(samples, query):
 
 class BoxUniform(Independent):
     def __init__(
-        self,
-        low: ScalarFloat,
-        high: ScalarFloat,
-        reinterpreted_batch_ndims: int = 1,
+        self, low: ScalarFloat, high: ScalarFloat, reinterpreted_batch_ndims: int = 1,
     ):
         """Multidimensional uniform distribution defined on a box.
 
