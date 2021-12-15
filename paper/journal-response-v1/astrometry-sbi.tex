@@ -12,6 +12,8 @@
 \newcommand{\healpix}{\package{HEALPix}}
 \newcommand{\deepsphere}{\package{DeepSphere}}
 
+\newcommand{\changes}[1]{{{\color{red}#1}}}
+
 \begin{document}\sloppy\sloppypar\raggedbottom\frenchspacing
 
 \title{Inferring dark matter substructure with astrometric lensing beyond the power spectrum}
@@ -125,9 +127,24 @@ Figure~\ref{fig:model} presents an illustrative summary of the neural network ar
 \section{Experiments on simulated data}
 \label{sec:experiments}
 
+\subsection{Baseline results and diagnostics}
+
 We evaluate our trained likelihood-ratio estimator on maps drawn from a benchmark configuration motivated by \citet{Hutten:2016jko,Springel:2008cc}, containing 150 subhalos in expectation between $10^{8}$--$10^{10}\,\mathrm{M}_\odot$ and corresponding to $f_\mathrm{sub} \simeq 0.2$. The left panel of Fig.~\ref{fig:experiment} shows the expected log-likelihood ratio test-statistic (TS) as a function of substructure fraction $f_\mathrm{sub}$ for this nominal configuration. This is obtained by evaluating the trained estimator on 100 test maps over a uniform grid in $f_\mathrm{sub}$ and taking the point-wise mean. Corresponding curves using the power spectrum approach are shown in blue, using minimum multipoles of $\ell \geq 5$ (dashed) and $\ell \geq 10$ (solid). Thresholds corresponding to 1- and 2-$\sigma$ significance assuming a $\chi^2$-distributed TS are shown as the horizontal grey lines. We see that sensitivity gains of over a factor of $\sim 2$ can be expected for this particular benchmark when using the machine learning approach compared to the traditional power spectrum approach. No significant bias on the central value of the inferred DM abundance relative to the overall uncertainty scale is observed.
 
 The right panel of Fig.~\ref{fig:experiment} shows the scaling of expected 1-$\sigma$ uncertainty on substructure fraction $f_\mathrm{sub}$ with assumed noise per quasar, keeping the number of quasars fixed (red, with the line showing the median and shaded band corresponding to the middle-95\% containment of the uncertainty inferred over 50 test datasets) compared to the power spectrum approach (blue lines). A far more favorable scaling of the machine learning approach is seen compared to the power spectrum approach, suggesting that it is especially advantageous in low signal-to-noise regimes that are generally most relevant for dark matter searches.
+
+\changes{Finally, we assess the quality of the approximate likelihood-ratio estimator through a test of statistical coverage. Within a hypothesis testing framework, this is necessary in order to ensure that the learned estimator is conservative over the parameter range of interest and does not produced overly confident or biased results~\citep{hermans2021averting}. We obtain the estimated TS profile for 1000 simulated samples with true substructure fraction values drawn from the range $f_\mathrm{sub}\in[0.1, 0.3]$. In doing so, we exclude parameter points towards the edges of our parameter space since the corresponding confidence intervals in these cases would extend outside of the tested parameter range, as can also be inferred from the baseline analysis shown in Fig.~\ref{fig:experiment}. For nominal confidence levels in the range $1-\alpha\in[0.05, 0.95]$ we compute the empirical coverage over the set of samples, defined as the fraction of samples whose true parameter value falls within the TS confidence interval, computed for a given confidence level under the assumption that the TS is $\chi^2$-distributed~\citep{10.1214/aoms/1177732360}. The procedure is repeated for 10 different sets of 1000 samples in order to estimate the statistical uncertainty associated with the empirical coverage.
+
+The results of the coverage test are shown in Fig.~\ref{fig:coverage}, illustrating the median (solid red) and middle-68\% containment (red band) of the empirical coverage. We see that the empirical coverage has the desired property of being slightly conservative while still being close to the perfectly-calibrated regime indicated by the dashed-grey line. We emphasize that this diagnostic tests the quality of the likelihood-ratio estimator over the entire evaluation parameter range of interest $f_\mathrm{sub}\in[0.1, 0.3]$ rather than the baseline value $f_\mathrm{sub}\simeq0.2$ in isolation}.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.45\textwidth]{coverage}
+\caption{\changes{Calibration test}}
+\label{fig:coverage}
+\end{figure}
+    
+\subsection{Experiments with unmodeled noise correlated on large scales}
 
 Since the existence of measurement noise correlated on large spatial scales is a potential source of systematic uncertainty when working with astrometric maps, we test the susceptibility of our method to such effects by creating simulated data containing large-scale noise not previously seen by the trained estimator. Instead of assuming a scale-invariant noise power spectrum $C_\ell^\mathrm{noise} = 4\pi \sigma_{\mu}^2 / N_q$~\citep{Mishra-Sharma:2020ynk}, in this case we model noise with an order of magnitude excess in power on scales $\ell \lesssim 10$, parameterized as $C_\ell^\mathrm{noise} = 4\pi\sigma_{\mu}^2 / N_q \cdot \left(10 - 9 S(\ell - 10)\right)$ where $S$ denotes the sigmoid function.
 The left panel of Fig.~\ref{fig:noise_test} illustrates this noise model (thicker green line) as well as the power spectrum of one simulated realization from this model (thinner green line, obtained using the \healpix module \texttt{anafast}) contrasted with the standard scale-invariant noise case (red lines). The right panel of Fig.~\ref{fig:noise_test} shows the expected log-likelihood ratio test-statistic profile for the two cases. Although a bias in the maximum-likelihood estimate of $f_\mathrm{sub}$ is seen when the test data has unmodeled noise (green line), the true test parameter value (dashed vertical line) is seen to lie well within the inferred 1-$\sigma$ confidence interval. This suggests that the method is only marginally susceptible to substantive amounts of correlated noise on large spatial scales.
@@ -139,6 +156,17 @@ The left panel of Fig.~\ref{fig:noise_test} illustrates this noise model (thicke
 \label{fig:noise_test}
 \end{figure*}
 
+\subsection{Experiments with a data-driven noise model}
+
+\changes{We finally assess the performance of our model using a realistic, data-drive noise model obtained using the astrometric catalog of quasars in \emph{Gaia}'s second data release (DR2). The catalog contains the measured 2-dimensional positions, proper motions, as well as proper motion uncertainties of 555,934 quasars. We bin the proper motion uncertainties using the \healpix pixelization scheme used in the analysis, down-weighting the mean variance in each pixel by the number of quasars in that pixel.}
+
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=0.97\textwidth]{anisotropic_noise}
+\caption{\changes{\emph{(Left)}  \emph{(Right)}}}
+\label{fig:anisotropic_noise}
+\end{figure*}
+    
 \section{Conclusions and outlook}
 \label{sec:conclusions}
 
@@ -160,7 +188,9 @@ This work is supported by the NSF CAREER grant PHY-1554858, NSF grants PHY-16207
 This work is supported by the National Science Foundation under Cooperative Agreement PHY-2019786 (The NSF AI Institute for Artificial Intelligence and Fundamental Interactions, \url{http://iaifi.org/}).
 This material is based upon work supported by the U.S. Department of Energy, Office of Science, Office of High Energy Physics of U.S. Department of Energy under grant Contract Number DE-SC0012567.
 This work made use of the NYU IT High Performance Computing resources, services, and staff expertise. 
-This research has made use of NASA's Astrophysics Data System. We acknowledge the use of the \deepsphere graph convolutional layer implementation as well as code used to produce elements of Fig.~\ref{fig:model} from the code repository associated with \citet{2020arXiv201215000D}.\footnote{\url{https://github.com/deepsphere/deepsphere-pytorch}}
+This research has made use of NASA's Astrophysics Data System. 
+This work has made use of data from the European Space Agency (ESA) mission {\it Gaia} (\url{https://www.cosmos.esa.int/gaia}), processed by the {\it Gaia} Data Processing and Analysis Consortium (DPAC, \url{https://www.cosmos.esa.int/web/gaia/dpac/consortium}). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the {\it Gaia} Multilateral Agreement. 
+We acknowledge the use of the \deepsphere graph convolutional layer implementation as well as code used to produce elements of Fig.~\ref{fig:model} from the code repository associated with \citet{2020arXiv201215000D}.\footnote{\url{https://github.com/deepsphere/deepsphere-pytorch}}
 \end{acknowledgments}
 
 \software{
