@@ -55,8 +55,12 @@ class StandardizeInputs(nn.Module):
 
     def forward(self, x, theta, add_noise=True):
 
+        # print(x[x != 0].std())
+
         if add_noise:
             x = self.add_noise(x)
+
+        # print(x[x != 0].std())
 
         x = self.standardizing_net_y(x)
 

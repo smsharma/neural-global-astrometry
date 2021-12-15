@@ -22,9 +22,9 @@ cd /scratch/sm8383/neural-global-astrometry/
 # Grid over configurations #
 ############################
 
-batch_size_list = [256]
+batch_size_list = [512]
 activations = ["relu"]
-kernel_size_list = [5, 8]
+kernel_size_list = [8]
 n_neighbours_list = [8]
 laplacian_types = ["combinatorial"]
 conv_types = ["chebconv"]
@@ -42,7 +42,7 @@ for n_neighbours in n_neighbours_list:
                             for sigma_noise in sigma_noise_list:
                                 for pooling_end in pooling_end_list:
                                     batchn = batch + "\n"
-                                    batchn += "python -u train.py --sample train --name response_bugfix --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {} --sigma_noise {} --fc_dims '[[-1, 1024],[1024, 256]]' --numpy_noise 0 --pooling_end {} --sigma_noise_model_file gaia_DR2_quasar_noise.npy".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source, sigma_noise, pooling_end)
+                                    batchn += "python -u train.py --sample train --name response_bugfix --batch_size {} --activation {} --kernel_size {} --laplacian_type {} --conv_type {} --n_neighbours {} --conv_source {} --sigma_noise {} --fc_dims '[[-1, 1024],[1024, 256]]' --numpy_noise 0 --pooling_end {} --sigma_noise_model_file gaia_DR2_quasar_noise_inv.npy".format(batch_size, activation, kernel_size, laplacian_type, conv_type, n_neighbours, conv_source, sigma_noise, pooling_end)
                                     fname = "batch/submit.batch"
                                     f = open(fname, "w")
                                     f.write(batchn)
