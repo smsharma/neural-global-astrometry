@@ -12,10 +12,9 @@ from models.layers import SphericalChebBNPool, SphericalChebBNPoolGeom
 
 
 class SphericalGraphCNN(nn.Module):
-    """Spherical GCNN Autoencoder.
-    """
+    """Spherical GCNN Autoencoder."""
 
-    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 128], [128, 128], [128, 64]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1, pooling_end="average", save_reps=False):
+    def __init__(self, nside_list, indexes_list, kernel_size=4, n_neighbours=8, laplacian_type="combinatorial", fc_dims=[[-1, 128], [128, 128], [128, 64]], n_params=0, activation="relu", nest=True, conv_source="deepsphere", conv_type="chebconv", in_ch=1, pooling_end="average", mask=None, save_reps=False):
         """Initialization.
 
         Args:
@@ -31,6 +30,8 @@ class SphericalGraphCNN(nn.Module):
         self.pooling_end = pooling_end
 
         self.save_reps = save_reps
+
+        self.mask = mask
 
         # Specify convolutional part
 
@@ -96,6 +97,13 @@ class SphericalGraphCNN(nn.Module):
         # Initialize tensor
         x = x.view(-1, self.npix_init, self.in_ch)
         x_map = x[:, : self.npix_init, :]
+
+        # Apply mask
+        try:
+            if self.mask is not None:
+                x_map[:, self.mask, :] = 0.0
+        except:
+            pass
 
         # Convolutional layers
         for i_layer, layer in enumerate(self.cnn_layers):

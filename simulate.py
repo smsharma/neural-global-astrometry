@@ -21,9 +21,8 @@ logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore", category=AstropyDeprecationWarning)
 
 
-def simulate(n=1000, nside=64, max_sep=20):
-    """ High-level simulation script
-    """
+def simulate(n=1000, nside=64, max_sep=20, f_sub=-1):
+    """High-level simulation script"""
 
     logger.info("Generating training data with %s maps", n)
 
@@ -31,7 +30,10 @@ def simulate(n=1000, nside=64, max_sep=20):
     results = {}
 
     # Generate points for parameter of interest, here calibrated number of subhalos between 10^8 and 10^10 M_s
-    prior = utils.BoxUniform(low=torch.tensor([0.001]), high=torch.tensor([300.0]))
+    if f_sub == -1:
+        prior = utils.BoxUniform(low=torch.tensor([0.001]), high=torch.tensor([300.0]))
+    else:
+        prior = utils.BoxUniform(low=torch.tensor([f_sub]), high=torch.tensor([f_sub]))
     thetas = prior.sample((n,))
 
     logger.info("Generating maps...")
@@ -62,8 +64,7 @@ def simulate(n=1000, nside=64, max_sep=20):
 
 
 def save(data_dir, name, data):
-    """ Save simulated data to file
-    """
+    """Save simulated data to file"""
 
     logger.info("Saving results with name %s", name)
 
@@ -79,17 +80,20 @@ def save(data_dir, name, data):
 
 
 def parse_args():
-    """ Parse command line arguments
-    """
+    """Parse command line arguments"""
 
     parser = argparse.ArgumentParser(description="Main high-level script that starts the GCE simulations")
 
     parser.add_argument(
-        "-n", type=int, default=10000, help="Number of samples to generate",
+        "-n",
+        type=int,
+        default=10000,
+        help="Number of samples to generate",
     )
     parser.add_argument("--name", type=str, default=None, help="Sample name")
     parser.add_argument("--dir", type=str, default=".", help="Base directory")
     parser.add_argument("--debug", action="store_true", help="Prints debug output.")
+    parser.add_argument("--f_sub", type=float, default=-1, help="Which values to simulate; defaults to random sample from proposal")
 
     return parser.parse_args()
 
@@ -99,12 +103,14 @@ if __name__ == "__main__":
     args = parse_args()
 
     logging.basicConfig(
-        format="%(asctime)-5.5s %(name)-20.20s %(levelname)-7.7s %(message)s", datefmt="%H:%M", level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)-5.5s %(name)-20.20s %(levelname)-7.7s %(message)s",
+        datefmt="%H:%M",
+        level=logging.DEBUG if args.debug else logging.INFO,
     )
     logger.info("Hi!")
 
     name = "train" if args.name is None else args.name
-    results = simulate(n=args.n)
+    results = simulate(n=args.n, f_sub=args.f_sub)
     save(args.dir, name, results)
 
     logger.info("All done! Have a nice day!")
